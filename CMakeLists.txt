@@ -28,7 +28,7 @@ find_package(catkin REQUIRED
   camera_info_manager
 )
 find_package(OpenCV REQUIRED)
-# set(cv_bridge_DIR ~/catkin_ws/devel/share/cv_bridge/cmake)
+set(cv_bridge_DIR "/opt/ros/melodic/share/cv_bridge/cmake")
 set(OpenCV_DIR "/usr/local/include/opencv4/opencv2")
 
 find_package(Eigen3 REQUIRED)

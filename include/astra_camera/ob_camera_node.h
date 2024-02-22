@@ -177,6 +177,8 @@ class OBCameraNode {
   bool getSupportedVideoModesCallback(GetStringRequest& request, GetStringResponse& response,
                                       const stream_index_pair& stream_index);
 
+  //bool getLaserStatusCallback(GetBoolRequest& request, GetBoolResponse& response);
+
   bool getLdpStatusCallback(GetBoolRequest& request, GetBoolResponse& response);
 
   bool toggleSensor(const stream_index_pair& stream_index, bool enabled, std::string& msg);
@@ -214,6 +216,7 @@ class OBCameraNode {
   void pollFrame();
 
   void dcw2Align(const cv::Mat& src, cv::Mat& dst);
+  void maxProAlign(const cv::Mat& src, cv::Mat& dst);
 
  private:
   ros::NodeHandle nh_;
@@ -262,6 +265,7 @@ class OBCameraNode {
   std::map<stream_index_pair, ros::ServiceServer> set_auto_exposure_srv_;
   ros::ServiceServer get_device_srv_;
   ros::ServiceServer set_laser_enable_srv_;
+  //ros::ServiceServer get_laser_status_srv_;
   ros::ServiceServer set_ldp_enable_srv_;
   ros::ServiceServer set_fan_enable_srv_;
   ros::ServiceServer get_camera_info_srv_;
@@ -323,7 +327,9 @@ class OBCameraNode {
   std::condition_variable poll_frame_thread_cv_;
   bool enable_publish_extrinsic_ = false;
   int soft_filter_ = 2;
+  //Default 16
   int soft_filter_max_diff_ = 16;
+  //Default 480
   int soft_filter_max_speckle_size_ = 480;
   MultiDeviceSyncMode multi_device_sync_mode_;
 };

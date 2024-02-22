@@ -41,7 +41,6 @@
     <arg name="depth_roi_width" default="-1"/>
     <arg name="depth_roi_height" default="-1"/>
     <arg name="depth_scale" default="1"/>
-    <arg name="color_depth_synchronization" default="false"/>
     <arg name="use_uvc_camera" default="true"/>
     <arg name="uvc_vendor_id" default="0x2bc5"/>
     <arg name="uvc_product_id" default="0x0561"/>
@@ -53,6 +52,13 @@
     <arg name="oni_log_to_file" default="false"/>
     <arg name="enable_d2c_viewer" default="false"/>
     <arg name="enable_publish_extrinsic" default="false"/>
+    <!-- software filter 0-off ,1-on (default,support windows/linux/arm/
+    ,not support android),2 - Optimized software filtering algorithm,support windows/linux/arm/android-->
+    <arg name="soft_filter" default="2"/>
+    <!-- software filter param MaxDiff (default 16)-support when SoftFilter =2 -->
+    <arg name="soft_filter_max_diff" default="0"/>
+    <!-- software filter param maxSpeckleSize -support when SoftFilter =2-->
+    <arg name="soft_filter_max_speckle_size" default="0"/>
     <group ns="$(arg camera_name)">
         <node name="camera" pkg="astra_camera" type="astra_camera_node" output="screen">
             <param name="camera_name" value="$(arg camera_name)"/>
@@ -95,7 +101,6 @@
             <param name="depth_roi_width" value="$(arg depth_roi_width)"/>
             <param name="depth_roi_height" value="$(arg depth_roi_height)"/>
             <param name="depth_scale" value="$(arg depth_scale)"/>
-            <param name="color_depth_synchronization" value="$(arg color_depth_synchronization)"/>
             <param name="use_uvc_camera" value="$(arg use_uvc_camera)"/>
             <param name="uvc_vendor_id" value="$(arg uvc_vendor_id)"/>
             <param name="uvc_product_id" value="$(arg uvc_product_id)"/>
@@ -106,6 +111,9 @@
             <param name="oni_log_to_console" value="$(arg oni_log_to_console)"/>
             <param name="oni_log_to_file" value="$(arg oni_log_to_file)"/>
             <param name="enable_d2c_viewer" value="$(arg enable_d2c_viewer)"/>
+            <param name="soft_filter" value="$(arg soft_filter)"/>
+            <param name="soft_filter_max_diff" value="$(arg soft_filter_max_diff)"/>
+            <param name="soft_filter_max_speckle_size" value="$(arg soft_filter_max_speckle_size)"/>
             <remap from="/$(arg camera_name)/depth/color/points" to="/$(arg camera_name)/depth_registered/points"/>
         </node>
     </group>

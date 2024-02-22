@@ -175,8 +175,12 @@ void OBCameraNode::setupDevices() {
   for (const auto& stream_index : IMAGE_STREAMS) {
     if (enable_[stream_index] && !device_->hasSensor(stream_index.first)) {
       std::stringstream ss;
-      ss << "OBCameraNode::setupDevices failed to get sensor:" << stream_name_[stream_index]
-         << " from device. maybe hardware has some problem, or the device is plugged out.";
+      if(stream_index == COLOR && use_uvc_camera_){
+        //Do nothing
+      } else {
+        ss << "OBCameraNode:: Failed to get sensor:" << stream_name_[stream_index]
+           << " from device. maybe hardware has some problem, or the device is not supported.";
+      }
       ROS_WARN_STREAM("check device status " << device_->isValid());
       ROS_WARN_STREAM(ss.str());
     }
@@ -198,8 +202,12 @@ void OBCameraNode::setupDevices() {
       }
       streams_[stream_index] = stream;
     } else {
-      ROS_WARN_STREAM("OBCameraNode::setupDevices failed to create stream "
+      if(stream_index == COLOR && use_uvc_camera_){
+        //Do nothing
+      } else {
+        ROS_WARN_STREAM("OBCameraNode::setupDevices failed to create stream "
                       << stream_name_[stream_index] << ", stream is disabled or sensor not found");
+      }
       if (streams_[stream_index]) {
         ROS_ERROR_STREAM("code should not reach here, it's MUST a hidden bug");
         ROS_WARN_STREAM("OBCameraNode::setupDevices stream " << stream_name_[stream_index]
@@ -209,9 +217,6 @@ void OBCameraNode::setupDevices() {
       enable_[stream_index] = false;
     }
   }
-  device_->setProperty(XN_STREAM_PROPERTY_SOFTWARE_FILTER, soft_filter_);
-  device_->setProperty(XN_STREAM_PROPERTY_DEPTH_MAX_DIFF, soft_filter_max_diff_);
-  device_->setProperty(XN_STREAM_PROPERTY_DEPTH_MAX_SPECKLE_SIZE, soft_filter_max_speckle_size_);
 }
 
 void OBCameraNode::setupFrameCallback() {
@@ -384,6 +389,17 @@ void OBCameraNode::startStream(const stream_index_pair& stream_index) {
     setIRExposure(ir_exposure_);
   }
 
+  if (stream_index == DEPTH) {
+    streams_[stream_index]->setProperty(XN_STREAM_PROPERTY_SOFTWARE_FILTER, soft_filter_);
+    if (soft_filter_max_diff_ != 0) {
+      streams_[stream_index]->setProperty(XN_STREAM_PROPERTY_DEPTH_MAX_DIFF, soft_filter_max_diff_);
+    }
+    if (soft_filter_max_speckle_size_ != 0) {
+      streams_[stream_index]->setProperty(XN_STREAM_PROPERTY_DEPTH_MAX_SPECKLE_SIZE,
+                                          soft_filter_max_speckle_size_);
+    }
+  }
+
   auto status = streams_[stream_index]->start();
   if (status == openni::STATUS_OK) {
     stream_started_[stream_index] = true;
@@ -490,8 +506,8 @@ void OBCameraNode::getParameters() {
     depth_align_ = true;
   }
   soft_filter_ = nh_private_.param<int>("soft_filter", 2);
-  soft_filter_max_diff_ = nh_private_.param<int>("soft_filter_max_diff", 16);
-  soft_filter_max_speckle_size_ = nh_private_.param<int>("soft_filter_max_speckle_size", 480);
+  soft_filter_max_diff_ = nh_private_.param<int>("soft_filter_max_diff", 0);
+  soft_filter_max_speckle_size_ = nh_private_.param<int>("soft_filter_max_speckle_size", 0);
 }
 
 void OBCameraNode::setupTopics() {
@@ -701,9 +717,15 @@ void OBCameraNode::onNewFrameCallback(const openni::VideoFrameRef& frame,
   } else if (stream_index == DEPTH && depth_align_ && pid == DABAI_DCW2_DEPTH_PID) {
     dst_width = width_[COLOR];
     dst_height = height_[COLOR];
-
     cv::Mat dst(dst_height, dst_width, CV_16UC1);
     dcw2Align(image, dst);
+    image.create(dst_height, dst_width, image.type());
+    image = dst;
+  } else if (stream_index == DEPTH && depth_align_ && (pid == DABAI_MAX_PRO_PID || pid == GEMINI_UW_PID)) {
+    dst_width = width_[COLOR];
+    dst_height = height_[COLOR];
+    cv::Mat dst(dst_height, dst_width, CV_16UC1);
+    maxProAlign(image, dst);
     image.create(dst_height, dst_width, image.type());
     image = dst;
   }
@@ -744,12 +766,26 @@ void OBCameraNode::onNewFrameCallback(const openni::VideoFrameRef& frame,
     std::string filename = current_path + "/image/" + stream_name_[stream_index] + "_" +
                            std::to_string(image_msg.width) + "x" +
                            std::to_string(image_msg.height) + "_" + std::to_string(fps) + "hz_" +
-                           ss.str() + ".jpg";
+                           ss.str() + ".png";
     if (!boost::filesystem::exists(current_path + "/image")) {
       boost::filesystem::create_directory(current_path + "/image");
     }
     ROS_INFO_STREAM("Saving image to " << filename);
-    cv::imwrite(filename, image);
+
+    ROS_INFO_STREAM("Saving image to :" << stream_index.first);
+    if (stream_index.first == openni::SENSOR_DEPTH) {
+      auto image_to_save = cv_bridge::toCvCopy(image_msg, encoding_[stream_index])->image;
+      cv::imwrite(filename, image_to_save);
+    } else if (stream_index.first == openni::SENSOR_COLOR) {
+      auto image_to_save =
+          cv_bridge::toCvCopy(image_msg, sensor_msgs::image_encodings::BGR8)->image;
+      cv::imwrite(filename, image_to_save);
+    } else if (stream_index.first == openni::SENSOR_IR) {
+      cv::imwrite(filename, image);
+    } else {
+      ROS_ERROR_STREAM("Unsupported stream type: " << stream_index.first);
+    }
+    
     save_images_[stream_index] = false;
   }
 }
@@ -764,7 +800,7 @@ void OBCameraNode::setDepthColorSync(bool data) {
 
 void OBCameraNode::setDepthToColorResolution(int width, int height) {
   const auto pid = device_info_.getUsbProductId();
-  if (pid != DABAI_DCW_DEPTH_PID && pid != GEMINI_E_DEPTH_PID && pid != DABAI_MAX_PID) {
+  if (pid != DABAI_DCW_DEPTH_PID && pid != GEMINI_E_DEPTH_PID) {
     return;
   }
   if (!depth_align_ && !enable_pointcloud_xyzrgb_) {
@@ -978,4 +1014,23 @@ void OBCameraNode::dcw2Align(const cv::Mat& src, cv::Mat& dst) {
     return;
   }
 }
+
+void OBCameraNode::maxProAlign(const cv::Mat& src, cv::Mat& dst) {
+  int color_width = width_[COLOR];
+  int color_height = height_[COLOR];
+  int depth_width = width_[DEPTH];
+  int depth_height = height_[DEPTH];
+  if (color_width == 640 && color_height == 480 && depth_width == 640 && depth_height == 400) {
+    // take src up 480x360, then upscale to 640x680
+    cv::Mat src_up = src(cv::Rect(96, 32, 448, 336));
+    cv::resize(src_up, dst, cv::Size(640, 480), 0, 0, cv::INTER_NEAREST);
+
+  } else {
+    ROS_ERROR_STREAM("Not support D2C config  color_width "
+                     << color_width << " color_height " << color_height << " depth_width "
+                     << depth_width << " depth_height " << depth_height);
+    return;
+  }
+}
+
 }  // namespace astra_camera

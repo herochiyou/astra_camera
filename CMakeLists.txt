@@ -28,9 +28,6 @@ find_package(catkin REQUIRED
   camera_info_manager
 )
 find_package(OpenCV REQUIRED)
-set(cv_bridge_DIR "/opt/ros/melodic/share/cv_bridge/cmake")
-set(OpenCV_DIR "/usr/local/include/opencv4/opencv2")
-
 find_package(Eigen3 REQUIRED)
 find_package(Boost REQUIRED)
 find_package(PkgConfig REQUIRED)
@@ -129,8 +126,6 @@ add_definitions(-Dlibuvc_VERSION_PATCH=${libuvc_VERSION_PATCH})
 set(ORBBEC_OPENNI2_REDIST
   "${CMAKE_CURRENT_SOURCE_DIR}/include/openni2_redist/${HOST_PLATFORM}")
 
-message("${OpenCV_LIBS}"${OpenCV_LIBS})
-
 link_directories(${ORBBEC_OPENNI2_REDIST}
   ${catkin_LINK_DIRS}
   ${OpenCV_LIBS})
@@ -205,7 +200,6 @@ target_link_libraries(${PROJECT_NAME}_node
 add_executable(list_devices_node
   src/list_devices_node.cpp
 )
-
 target_include_directories(list_devices_node PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>

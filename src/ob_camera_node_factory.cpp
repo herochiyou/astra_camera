@@ -278,14 +278,16 @@ void OBCameraNodeFactory::checkConnectionTimer() {
 void OBCameraNodeFactory::queryDevice() {
   while (is_alive_ && ros::ok()) {
     if (!device_connected_) {
-      ROS_INFO_STREAM_THROTTLE(1, "Query device");
+      LOG(ERROR) << "Query device";
       auto device_info_list = context_->queryDeviceList();
-      std::this_thread::sleep_for(std::chrono::milliseconds(100));
+      sleep(0.1);
+      // std::this_thread::sleep_for(std::chrono::milliseconds(100));
       for (auto &device_info : device_info_list) {
         onDeviceConnected(&device_info);
       }
     } else {
-      std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+      sleep(1);
+      // std::this_thread::sleep_for(std::chrono::milliseconds(1000));
     }
   }
 }

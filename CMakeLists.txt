@@ -126,6 +126,8 @@ add_definitions(-Dlibuvc_VERSION_PATCH=${libuvc_VERSION_PATCH})
 set(ORBBEC_OPENNI2_REDIST
   "${CMAKE_CURRENT_SOURCE_DIR}/include/openni2_redist/${HOST_PLATFORM}")
 
+  message("${OpenCV_LIBS}"${OpenCV_LIBS})
+
 link_directories(${ORBBEC_OPENNI2_REDIST}
   ${catkin_LINK_DIRS}
   ${OpenCV_LIBS})

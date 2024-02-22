@@ -202,6 +202,7 @@ target_link_libraries(${PROJECT_NAME}_node
 add_executable(list_devices_node
   src/list_devices_node.cpp
 )
+
 target_include_directories(list_devices_node PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>

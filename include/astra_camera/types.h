@@ -30,6 +30,7 @@
 #include "astra_camera/Metadata.h"
 #include "astra_camera/SetInt32.h"
 #include "astra_camera/SetString.h"
+#include "json.hpp"
 #include "std_msgs/Empty.h"
 #include "std_srvs/Empty.h"
 #include "std_srvs/SetBool.h"
@@ -37,7 +38,6 @@
 #include <chrono>
 #include <cstdlib>
 #include <ctime>
-// #include "json.hpp"
 
 namespace astra_camera {
 using FrameCallbackFunction =

@@ -28,6 +28,7 @@
 #include "OniCAPI.h"
 #include "OniCProperties.h"
 #include "OniCTypes.h"
+#include "glog/logging.h"
 
 /**
 openni is the namespace of the entire C++ API of OpenNI

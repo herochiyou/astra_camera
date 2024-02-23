@@ -278,9 +278,11 @@ void OBCameraNodeFactory::checkConnectionTimer() {
 void OBCameraNodeFactory::queryDevice() {
   while (is_alive_ && ros::ok()) {
     if (!device_connected_) {
-      LOG_EVERY_N(ERROR, 100) << "Query device";
+
       auto device_info_list = context_->queryDeviceList();
-      sleep(0.1);
+      LOG_EVERY_N(ERROR, 1000)
+          << "Query device,size:(" << device_info_list.size() << ").";
+      sleep(1);
       // std::this_thread::sleep_for(std::chrono::milliseconds(100));
       for (auto &device_info : device_info_list) {
         onDeviceConnected(&device_info);

@@ -14,14 +14,14 @@
 
 #include "astra_camera/ob_camera_node_factory.h"
 using namespace astra_camera;
-int main(int argc, char** argv) {
-  ROS_INFO_STREAM("Starting camera node...");
+int main(int argc, char **argv) {
+  LOG(ERROR) << "Starting camera node...";
   ros::init(argc, argv, "astra_camera_node");
   ros::NodeHandle nh;
   ros::NodeHandle nh_private("~");
-  ROS_INFO_STREAM("Creating camera node...");
+  LOG(ERROR) << "Creating camera node...";
   OBCameraNodeFactory node_factory(nh, nh_private);
-  ROS_INFO_STREAM("Creating camera node done...");
+  LOG(ERROR) << "Creating camera node done...";
   ros::spin();
   return 0;
 }

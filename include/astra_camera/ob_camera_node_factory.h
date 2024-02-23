@@ -23,6 +23,7 @@
 #include <cerrno>
 #include <thread>
 
+#include "glog/logging.h"
 #include "ob_camera_node.h"
 #include "ob_context.h"
 #include "std_msgs/Empty.h"
@@ -30,28 +31,29 @@
 
 namespace astra_camera {
 class OBCameraNodeFactory {
- public:
-  explicit OBCameraNodeFactory(ros::NodeHandle& nh, ros::NodeHandle& nh_private);
+  public:
+  explicit OBCameraNodeFactory(ros::NodeHandle &nh,
+                               ros::NodeHandle &nh_private);
 
   ~OBCameraNodeFactory();
 
- private:
+  private:
   void init();
 
-  void startDevice(const std::shared_ptr<openni::Device>& device,
-                   const openni::DeviceInfo* device_info);
+  void startDevice(const std::shared_ptr<openni::Device> &device,
+                   const openni::DeviceInfo *device_info);
 
-  void onDeviceConnected(const openni::DeviceInfo* device_info);
+  void onDeviceConnected(const openni::DeviceInfo *device_info);
 
-  void onDeviceDisconnected(const openni::DeviceInfo* device_info);
+  void onDeviceDisconnected(const openni::DeviceInfo *device_info);
 
   void checkConnectionTimer();
 
-  static OniLogSeverity getLogLevelFromString(const std::string& level);
+  static OniLogSeverity getLogLevelFromString(const std::string &level);
 
   void queryDevice();
 
- private:
+  private:
   ros::NodeHandle nh_;
   ros::NodeHandle nh_private_;
   std::atomic_bool is_alive_{false};
@@ -75,9 +77,9 @@ class OBCameraNodeFactory {
   bool oni_log_to_file_ = false;
   std::recursive_mutex device_lock_;
   std::unique_ptr<std::thread> query_device_thread_ = nullptr;
-  pthread_mutex_t* astra_device_lock_ = nullptr;
+  pthread_mutex_t *astra_device_lock_ = nullptr;
   pthread_mutexattr_t astra_device_lock_attr_;
-  uint8_t* astra_device_lock_shm_ptr_ = nullptr;
+  uint8_t *astra_device_lock_shm_ptr_ = nullptr;
   int astra_device_lock_shm_id_ = -1;
 };
-}  // namespace astra_camera
+} // namespace astra_camera

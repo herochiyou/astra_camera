@@ -2093,7 +2093,6 @@ class OpenNI {
     OniDeviceInfo *m_pDeviceInfos;
     int m_deviceInfoCount;
     oniGetDeviceList(&m_pDeviceInfos, &m_deviceInfoCount);
-    // LOG(ERROR) << "m_deviceInfoCount:(" << m_deviceInfoCount << ").";
     LOG(ERROR) << "m_deviceInfoCount:(" << m_deviceInfoCount << ").";
     deviceInfoList->_setData((DeviceInfo *)m_pDeviceInfos, m_deviceInfoCount,
                              true);

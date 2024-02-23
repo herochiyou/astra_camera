@@ -18,11 +18,10 @@
 #include <utility>
 
 namespace astra_camera {
-OBCameraNode::OBCameraNode(ros::NodeHandle& nh, ros::NodeHandle& nh_private,
-                           std::shared_ptr<openni::Device> device, bool use_uvc_camera)
-    : nh_(nh),
-      nh_private_(nh_private),
-      device_(std::move(device)),
+OBCameraNode::OBCameraNode(ros::NodeHandle &nh, ros::NodeHandle &nh_private,
+                           std::shared_ptr<openni::Device> device,
+                           bool use_uvc_camera)
+    : nh_(nh), nh_private_(nh_private), device_(std::move(device)),
       use_uvc_camera_(use_uvc_camera) {
   init();
 }
@@ -48,7 +47,7 @@ void OBCameraNode::clean() {
   }
   ROS_INFO_STREAM("OBCameraNode::clean stop tf done.");
   stopStreams();
-  for (const auto& stream_index : IMAGE_STREAMS) {
+  for (const auto &stream_index : IMAGE_STREAMS) {
     if (streams_[stream_index]) {
       streams_[stream_index]->destroy();
       streams_[stream_index].reset();
@@ -82,7 +81,7 @@ void OBCameraNode::init() {
   }
   setupUVCCamera();
   setupD2CConfig();
-  for (const auto& stream_index : IMAGE_STREAMS) {
+  for (const auto &stream_index : IMAGE_STREAMS) {
     if (streams_[stream_index]) {
       save_images_[stream_index] = false;
     }
@@ -91,25 +90,29 @@ void OBCameraNode::init() {
   init_ir_exposure_ = getIRExposure();
   if (enable_reconfigure_) {
     reconfigure_server_ = std::make_unique<ReconfigureServer>(nh_private_);
-    reconfigure_server_->setCallback([this](const AstraConfig& config, uint32_t level) {
-      this->reconfigureCallback(config, level);
-    });
+    reconfigure_server_->setCallback(
+        [this](const AstraConfig &config, uint32_t level) {
+          this->reconfigureCallback(config, level);
+        });
   }
   if (keep_alive_) {
-    keep_alive_timer_ =
-        nh_.createTimer(ros::Duration(keep_alive_interval_), &OBCameraNode::sendKeepAlive, this);
+    keep_alive_timer_ = nh_.createTimer(ros::Duration(keep_alive_interval_),
+                                        &OBCameraNode::sendKeepAlive, this);
   }
   if (enable_pointcloud_) {
-    point_cloud_xyz_node_ = std::make_unique<PointCloudXyzNode>(nh_, nh_private_);
+    point_cloud_xyz_node_ =
+        std::make_unique<PointCloudXyzNode>(nh_, nh_private_);
   }
   if (enable_pointcloud_xyzrgb_) {
-    point_cloud_xyzrgb_node_ = std::make_unique<PointCloudXyzrgbNode>(nh_, nh_private_);
+    point_cloud_xyzrgb_node_ =
+        std::make_unique<PointCloudXyzrgbNode>(nh_, nh_private_);
   }
   run_poll_frame_thread_ = true;
-  poll_frame_thread_ = std::make_unique<std::thread>(&OBCameraNode::pollFrame, this);
+  poll_frame_thread_ =
+      std::make_unique<std::thread>(&OBCameraNode::pollFrame, this);
   initialized_ = true;
 
-  for (const auto& stream_index : IMAGE_STREAMS) {
+  for (const auto &stream_index : IMAGE_STREAMS) {
     if (!enable_[stream_index]) {
       continue;
     }
@@ -165,27 +168,30 @@ void OBCameraNode::setupCameraInfoManager() {
   ir_info_manager_ = std::make_unique<camera_info_manager::CameraInfoManager>(
       nh_private_, "ir_camera", ir_info_uri_);
   if (!use_uvc_camera_ && device_->hasSensor(openni::SENSOR_COLOR)) {
-    color_info_manager_ = std::make_unique<camera_info_manager::CameraInfoManager>(
-        nh_, "rgb_camera", color_info_uri_);
+    color_info_manager_ =
+        std::make_unique<camera_info_manager::CameraInfoManager>(
+            nh_, "rgb_camera", color_info_uri_);
   }
 }
 
 void OBCameraNode::setupDevices() {
   // first check
-  for (const auto& stream_index : IMAGE_STREAMS) {
+  for (const auto &stream_index : IMAGE_STREAMS) {
     if (enable_[stream_index] && !device_->hasSensor(stream_index.first)) {
       std::stringstream ss;
-      if(stream_index == COLOR && use_uvc_camera_){
-        //Do nothing
+      if (stream_index == COLOR && use_uvc_camera_) {
+        // Do nothing
       } else {
-        ss << "OBCameraNode:: Failed to get sensor:" << stream_name_[stream_index]
-           << " from device. maybe hardware has some problem, or the device is not supported.";
+        ss << "OBCameraNode:: Failed to get sensor:"
+           << stream_name_[stream_index]
+           << " from device. maybe hardware has some problem, or the device is "
+              "not supported.";
       }
       ROS_WARN_STREAM("check device status " << device_->isValid());
       ROS_WARN_STREAM(ss.str());
     }
   }
-  for (const auto& stream_index : IMAGE_STREAMS) {
+  for (const auto &stream_index : IMAGE_STREAMS) {
     stream_started_[stream_index] = false;
     if (enable_[stream_index] && device_->hasSensor(stream_index.first)) {
       if (use_uvc_camera_ && stream_index == COLOR) {
@@ -195,23 +201,26 @@ void OBCameraNode::setupDevices() {
       auto status = stream->create(*device_, stream_index.first);
       if (status != openni::STATUS_OK) {
         std::stringstream ss;
-        ss << "OBCameraNode::setupDevices failed to create stream " << stream_name_[stream_index]
+        ss << "OBCameraNode::setupDevices failed to create stream "
+           << stream_name_[stream_index]
            << " with error: " << openni::OpenNI::getExtendedError();
         ROS_ERROR_STREAM(ss.str());
         throw std::runtime_error(ss.str());
       }
       streams_[stream_index] = stream;
     } else {
-      if(stream_index == COLOR && use_uvc_camera_){
-        //Do nothing
+      if (stream_index == COLOR && use_uvc_camera_) {
+        // Do nothing
       } else {
         ROS_WARN_STREAM("OBCameraNode::setupDevices failed to create stream "
-                      << stream_name_[stream_index] << ", stream is disabled or sensor not found");
+                        << stream_name_[stream_index]
+                        << ", stream is disabled or sensor not found");
       }
       if (streams_[stream_index]) {
         ROS_ERROR_STREAM("code should not reach here, it's MUST a hidden bug");
-        ROS_WARN_STREAM("OBCameraNode::setupDevices stream " << stream_name_[stream_index]
-                                                             << " is already created, closing it");
+        ROS_WARN_STREAM("OBCameraNode::setupDevices stream "
+                        << stream_name_[stream_index]
+                        << " is already created, closing it");
         streams_[stream_index].reset();
       }
       enable_[stream_index] = false;
@@ -220,10 +229,10 @@ void OBCameraNode::setupDevices() {
 }
 
 void OBCameraNode::setupFrameCallback() {
-  for (const auto& stream_index : IMAGE_STREAMS) {
+  for (const auto &stream_index : IMAGE_STREAMS) {
     if (enable_[stream_index] && device_->hasSensor(stream_index.first)) {
-      auto frame_callback = [this,
-                             stream_index = stream_index](const openni::VideoFrameRef& frame) {
+      auto frame_callback = [this, stream_index = stream_index](
+                                const openni::VideoFrameRef &frame) {
         this->onNewFrameCallback(frame, stream_index);
       };
       stream_frame_callback_[stream_index] = frame_callback;
@@ -242,46 +251,48 @@ void OBCameraNode::setupSyncMode() {
     mode_str = "slave";
   }
   if (multi_device_sync_mode_ != MultiDeviceSyncMode::None) {
-    ROS_ERROR_STREAM("Set device" << getSerialNumber() << " sync mode to " << mode_str);
+    ROS_ERROR_STREAM("Set device" << getSerialNumber() << " sync mode to "
+                                  << mode_str);
     int value = mode;
-    auto status = device_->setProperty(XN_MODULE_PROPERTY_SET_DEVICE_MODE, value);
+    auto status =
+        device_->setProperty(XN_MODULE_PROPERTY_SET_DEVICE_MODE, value);
     if (status != openni::STATUS_OK) {
       ROS_ERROR_STREAM("Set multi device sync mode failed with error "
                        << openni::OpenNI::getExtendedError());
     }
   }
-
 }
 
 void OBCameraNode::setupVideoMode() {
   if (!use_uvc_camera_ && enable_[INFRA1] && enable_[COLOR]) {
-    ROS_WARN_STREAM(
-        "Infrared and Color streams are enabled. "
-        "Infrared stream will be disabled.");
+    ROS_WARN_STREAM("Infrared and Color streams are enabled. "
+                    "Infrared stream will be disabled.");
     enable_[INFRA1] = false;
   }
-  for (const auto& stream_index : IMAGE_STREAMS) {
+  for (const auto &stream_index : IMAGE_STREAMS) {
     supported_video_modes_[stream_index] = std::vector<openni::VideoMode>();
     if (device_->hasSensor(stream_index.first) && enable_[stream_index]) {
       if (use_uvc_camera_ && stream_index == COLOR) {
         continue;
       }
       auto stream = streams_[stream_index];
-      const auto& sensor_info = stream->getSensorInfo();
-      const auto& supported_video_modes = sensor_info.getSupportedVideoModes();
+      const auto &sensor_info = stream->getSensorInfo();
+      const auto &supported_video_modes = sensor_info.getSupportedVideoModes();
       int size = supported_video_modes.getSize();
       for (int i = 0; i < size; i++) {
-        supported_video_modes_[stream_index].emplace_back(supported_video_modes[i]);
+        supported_video_modes_[stream_index].emplace_back(
+            supported_video_modes[i]);
       }
       openni::VideoMode video_mode, default_video_mode;
       video_mode.setResolution(width_[stream_index], height_[stream_index]);
-      default_video_mode.setResolution(width_[stream_index], height_[stream_index]);
+      default_video_mode.setResolution(width_[stream_index],
+                                       height_[stream_index]);
       video_mode.setFps(fps_[stream_index]);
       video_mode.setPixelFormat(format_[stream_index]);
       default_video_mode.setPixelFormat(format_[stream_index]);
       bool is_supported_mode = false;
       bool is_default_mode_supported = false;
-      for (const auto& item : supported_video_modes_[stream_index]) {
+      for (const auto &item : supported_video_modes_[stream_index]) {
         if (video_mode == item) {
           is_supported_mode = true;
           stream_video_mode_[stream_index] = video_mode;
@@ -309,15 +320,17 @@ void OBCameraNode::setupVideoMode() {
                                                    "Stream will be disabled.");
           enable_[stream_index] = false;
           ROS_WARN_STREAM("Supported video modes: ");
-          for (const auto& item : supported_video_modes_[stream_index]) {
+          for (const auto &item : supported_video_modes_[stream_index]) {
             ROS_WARN_STREAM(item);
           }
         }
       }
       if (is_supported_mode) {
-        ROS_INFO_STREAM("set " << stream_name_[stream_index] << " video mode " << video_mode);
-        images_[stream_index] = cv::Mat(height_[stream_index], width_[stream_index],
-                                        image_format_[stream_index], cv::Scalar(0, 0, 0));
+        ROS_INFO_STREAM("set " << stream_name_[stream_index] << " video mode "
+                               << video_mode);
+        images_[stream_index] =
+            cv::Mat(height_[stream_index], width_[stream_index],
+                    image_format_[stream_index], cv::Scalar(0, 0, 0));
       }
     }
   }
@@ -336,14 +349,15 @@ void OBCameraNode::setupD2CConfig() {
   }
 }
 
-void OBCameraNode::startStream(const stream_index_pair& stream_index) {
+void OBCameraNode::startStream(const stream_index_pair &stream_index) {
   std::lock_guard<decltype(device_lock_)> lock(device_lock_);
   if (!is_running_) {
     ROS_ERROR_STREAM("Device is not running.");
     return;
   }
   if (!enable_[stream_index]) {
-    ROS_WARN_STREAM("Stream " << stream_name_[stream_index] << " is not enabled.");
+    ROS_WARN_STREAM("Stream " << stream_name_[stream_index]
+                              << " is not enabled.");
     return;
   }
   if (stream_index == COLOR && use_uvc_camera_) {
@@ -354,11 +368,13 @@ void OBCameraNode::startStream(const stream_index_pair& stream_index) {
     return;
   }
   if (stream_started_[stream_index]) {
-    ROS_WARN_STREAM("Stream " << stream_name_[stream_index] << " is already started.");
+    ROS_WARN_STREAM("Stream " << stream_name_[stream_index]
+                              << " is already started.");
     return;
   }
   ROS_INFO_STREAM("Start " << stream_name_[stream_index] << " stream.");
-  bool has_subscribers = image_publishers_[stream_index].getNumSubscribers() > 0;
+  bool has_subscribers =
+      image_publishers_[stream_index].getNumSubscribers() > 0;
   if (!has_subscribers) {
     ROS_INFO_STREAM("No subscribers for " << stream_name_[stream_index]
                                           << " stream. "
@@ -369,12 +385,15 @@ void OBCameraNode::startStream(const stream_index_pair& stream_index) {
   auto video_mode = stream_video_mode_.at(stream_index);
   CHECK(streams_.count(stream_index));
   if (!streams_[stream_index].get() && device_->hasSensor(stream_index.first)) {
-    ROS_WARN_STREAM("stream is not created, that is anomalous, but we'll try to create it.");
+    ROS_WARN_STREAM("stream is not created, that is anomalous, but we'll try "
+                    "to create it.");
     auto stream = std::make_shared<openni::VideoStream>();
     auto status = stream->create(*device_, stream_index.first);
     if (status != openni::STATUS_OK) {
-      ROS_ERROR_STREAM("Can't create " << stream_name_[stream_index] << " stream. "
-                                       << "OpenNI error: " << openni::OpenNI::getExtendedError());
+      ROS_ERROR_STREAM("Can't create " << stream_name_[stream_index]
+                                       << " stream. "
+                                       << "OpenNI error: "
+                                       << openni::OpenNI::getExtendedError());
       return;
     }
     streams_[stream_index] = stream;
@@ -383,20 +402,23 @@ void OBCameraNode::startStream(const stream_index_pair& stream_index) {
   streams_[stream_index]->setVideoMode(video_mode);
   streams_[stream_index]->setMirroringEnabled(false);
 
-  if(stream_index == INFRA1 && !ir_ae_) {
+  if (stream_index == INFRA1 && !ir_ae_) {
     setIRAutoExposure(false);
     setIRGain(ir_gain_);
     setIRExposure(ir_exposure_);
   }
 
   if (stream_index == DEPTH) {
-    streams_[stream_index]->setProperty(XN_STREAM_PROPERTY_SOFTWARE_FILTER, soft_filter_);
+    streams_[stream_index]->setProperty(XN_STREAM_PROPERTY_SOFTWARE_FILTER,
+                                        soft_filter_);
     if (soft_filter_max_diff_ != 0) {
-      streams_[stream_index]->setProperty(XN_STREAM_PROPERTY_DEPTH_MAX_DIFF, soft_filter_max_diff_);
+      streams_[stream_index]->setProperty(XN_STREAM_PROPERTY_DEPTH_MAX_DIFF,
+                                          soft_filter_max_diff_);
     }
     if (soft_filter_max_speckle_size_ != 0) {
-      streams_[stream_index]->setProperty(XN_STREAM_PROPERTY_DEPTH_MAX_SPECKLE_SIZE,
-                                          soft_filter_max_speckle_size_);
+      streams_[stream_index]->setProperty(
+          XN_STREAM_PROPERTY_DEPTH_MAX_SPECKLE_SIZE,
+          soft_filter_max_speckle_size_);
     }
   }
 
@@ -406,20 +428,24 @@ void OBCameraNode::startStream(const stream_index_pair& stream_index) {
     ROS_INFO_STREAM(stream_name_[stream_index] << " is started");
   } else {
     ROS_ERROR_STREAM("openni status " << status);
-    ROS_ERROR_STREAM("current errno " << errno << " system error string " << strerror(errno));
-    ROS_ERROR_STREAM(stream_name_[stream_index] << " start failed with ERROR "
-                                                << openni::OpenNI::getExtendedError());
+    ROS_ERROR_STREAM("current errno " << errno << " system error string "
+                                      << strerror(errno));
+    ROS_ERROR_STREAM(stream_name_[stream_index]
+                     << " start failed with ERROR "
+                     << openni::OpenNI::getExtendedError());
   }
 }
 
-void OBCameraNode::stopStream(const stream_index_pair& stream_index) {
+void OBCameraNode::stopStream(const stream_index_pair &stream_index) {
   std::lock_guard<decltype(device_lock_)> lock(device_lock_);
   if (!enable_[stream_index]) {
-    ROS_WARN_STREAM("Stream " << stream_name_[stream_index] << " is not enabled.");
+    ROS_WARN_STREAM("Stream " << stream_name_[stream_index]
+                              << " is not enabled.");
     return;
   }
   if (!stream_started_[stream_index]) {
-    ROS_WARN_STREAM("Stream " << stream_name_[stream_index] << " is not started.");
+    ROS_WARN_STREAM("Stream " << stream_name_[stream_index]
+                              << " is not started.");
     return;
   }
   ROS_INFO_STREAM("Stop " << stream_name_[stream_index] << " stream.");
@@ -431,7 +457,7 @@ void OBCameraNode::stopStream(const stream_index_pair& stream_index) {
 }
 
 void OBCameraNode::startStreams() {
-  for (const auto& stream_index : IMAGE_STREAMS) {
+  for (const auto &stream_index : IMAGE_STREAMS) {
     if (enable_[stream_index] && !stream_started_[stream_index]) {
       startStream(stream_index);
     }
@@ -439,7 +465,7 @@ void OBCameraNode::startStreams() {
 }
 
 void OBCameraNode::stopStreams() {
-  for (const auto& stream_index : IMAGE_STREAMS) {
+  for (const auto &stream_index : IMAGE_STREAMS) {
     if (stream_started_[stream_index]) {
       stopStream(stream_index);
     }
@@ -449,12 +475,13 @@ void OBCameraNode::stopStreams() {
 void OBCameraNode::getParameters() {
   camera_name_ = nh_private_.param<std::string>("camera_name", "camera");
   base_frame_id_ = camera_name_ + "_link";
-  for (const auto& stream_index : IMAGE_STREAMS) {
-    frame_id_[stream_index] = camera_name_ + "_" + stream_name_[stream_index] + "_frame";
+  for (const auto &stream_index : IMAGE_STREAMS) {
+    frame_id_[stream_index] =
+        camera_name_ + "_" + stream_name_[stream_index] + "_frame";
     optical_frame_id_[stream_index] =
         camera_name_ + "_" + stream_name_[stream_index] + "_optical_frame";
   }
-  for (const auto& stream_index : IMAGE_STREAMS) {
+  for (const auto &stream_index : IMAGE_STREAMS) {
     std::string param_name = stream_name_[stream_index] + "_width";
     width_[stream_index] = nh_private_.param<int>(param_name, IMAGE_WIDTH);
     param_name = stream_name_[stream_index] + "_height";
@@ -471,11 +498,12 @@ void OBCameraNode::getParameters() {
   ir_gain_ = nh_private_.param<int>("ir_gain", init_ir_gain_);
   ir_exposure_ = nh_private_.param<int>("ir_exposure", init_ir_exposure_);
 
-  for (const auto& stream_index : IMAGE_STREAMS) {
+  for (const auto &stream_index : IMAGE_STREAMS) {
     depth_aligned_frame_id_[stream_index] = optical_frame_id_[COLOR];
   }
   publish_tf_ = nh_private_.param<bool>("publish_tf", true);
-  color_depth_synchronization_ = nh_private_.param<bool>("color_depth_synchronization", false);
+  color_depth_synchronization_ =
+      nh_private_.param<bool>("color_depth_synchronization", false);
   tf_publish_rate_ = nh_private_.param<double>("tf_publish_rate", 10.0);
   color_roi_.x = nh_private_.param<int>("color_roi_x", -1);
   color_roi_.y = nh_private_.param<int>("color_roi_y", -1);
@@ -494,11 +522,15 @@ void OBCameraNode::getParameters() {
   keep_alive_ = nh_private_.param<bool>("keep_alive", false);
   keep_alive_interval_ = nh_private_.param<int>("keep_alive_interval", 15);
   enable_pointcloud_ = nh_private_.param<bool>("enable_point_cloud", false);
-  enable_pointcloud_xyzrgb_ = nh_private_.param<bool>("enable_point_cloud_xyzrgb", false);
-  enable_publish_extrinsic_ = nh_private_.param<bool>("enable_publish_extrinsic", false);
-  std::string sync_mode = nh_private_.param<std::string>("multi_device_sync_mode", "none");
+  enable_pointcloud_xyzrgb_ =
+      nh_private_.param<bool>("enable_point_cloud_xyzrgb", false);
+  enable_publish_extrinsic_ =
+      nh_private_.param<bool>("enable_publish_extrinsic", false);
+  std::string sync_mode =
+      nh_private_.param<std::string>("multi_device_sync_mode", "none");
   multi_device_sync_mode_ = getMultiDeviceSyncMode(sync_mode);
-  if (depth_align_ && !device_->hasSensor(openni::SENSOR_COLOR) && !use_uvc_camera_) {
+  if (depth_align_ && !device_->hasSensor(openni::SENSOR_COLOR) &&
+      !use_uvc_camera_) {
     ROS_WARN("No color sensor found, depth align will be disabled");
     depth_align_ = false;
   }
@@ -507,7 +539,8 @@ void OBCameraNode::getParameters() {
   }
   soft_filter_ = nh_private_.param<int>("soft_filter", 2);
   soft_filter_max_diff_ = nh_private_.param<int>("soft_filter_max_diff", 0);
-  soft_filter_max_speckle_size_ = nh_private_.param<int>("soft_filter_max_speckle_size", 0);
+  soft_filter_max_speckle_size_ =
+      nh_private_.param<int>("soft_filter_max_speckle_size", 0);
 }
 
 void OBCameraNode::setupTopics() {
@@ -529,9 +562,10 @@ void OBCameraNode::setupUVCCamera() {
     auto color_camera_info = getColorCameraInfo();
     auto serial_number = getSerialNumber();
     try {
-      uvc_camera_driver_ =
-          std::make_shared<UVCCameraDriver>(nh_, nh_private_, color_camera_info, serial_number);
-    } catch (const std::exception& e) {
+      uvc_camera_driver_ = std::make_shared<UVCCameraDriver>(
+          nh_, nh_private_, color_camera_info, serial_number);
+      LOG(ERROR) << "make share a uvc camera driver";
+    } catch (const std::exception &e) {
       ROS_ERROR_STREAM("Failed to initialize UVC camera: " << e.what());
       clean();
       throw e;
@@ -541,11 +575,14 @@ void OBCameraNode::setupUVCCamera() {
   }
 }
 
-void OBCameraNode::imageSubscribedCallback(const stream_index_pair& stream_index) {
-  ROS_INFO_STREAM("Image stream " << stream_name_[stream_index] << " subscribed");
+void OBCameraNode::imageSubscribedCallback(
+    const stream_index_pair &stream_index) {
+  ROS_INFO_STREAM("Image stream " << stream_name_[stream_index]
+                                  << " subscribed");
   std::lock_guard<decltype(device_lock_)> lock(device_lock_);
   if (!initialized_ || !is_running_) {
-    ROS_WARN_STREAM("Camera not initialized, subscribing to stream " << stream_name_[stream_index]);
+    ROS_WARN_STREAM("Camera not initialized, subscribing to stream "
+                    << stream_name_[stream_index]);
     return;
   }
   if (stream_started_[stream_index]) {
@@ -554,8 +591,10 @@ void OBCameraNode::imageSubscribedCallback(const stream_index_pair& stream_index
   startStream(stream_index);
 }
 
-void OBCameraNode::imageUnsubscribedCallback(const stream_index_pair& stream_index) {
-  ROS_INFO_STREAM("Image stream " << stream_name_[stream_index] << " unsubscribed");
+void OBCameraNode::imageUnsubscribedCallback(
+    const stream_index_pair &stream_index) {
+  ROS_INFO_STREAM("Image stream " << stream_name_[stream_index]
+                                  << " unsubscribed");
   std::lock_guard<decltype(device_lock_)> lock(device_lock_);
   if (!stream_started_[stream_index]) {
     return;
@@ -567,24 +606,26 @@ void OBCameraNode::imageUnsubscribedCallback(const stream_index_pair& stream_ind
 }
 
 void OBCameraNode::setupPublishers() {
-  for (const auto& stream_index : IMAGE_STREAMS) {
+  for (const auto &stream_index : IMAGE_STREAMS) {
     std::string name = stream_name_[stream_index];
     camera_info_publishers_[stream_index] =
         nh_.advertise<sensor_msgs::CameraInfo>(name + "/camera_info", 1, true);
     if (enable_[stream_index] && device_->hasSensor(stream_index.first)) {
-      ros::SubscriberStatusCallback image_subscribed_cb =
-          boost::bind(&OBCameraNode::imageSubscribedCallback, this, stream_index);
-      ros::SubscriberStatusCallback image_unsubscribed_cb =
-          boost::bind(&OBCameraNode::imageUnsubscribedCallback, this, stream_index);
+      ros::SubscriberStatusCallback image_subscribed_cb = boost::bind(
+          &OBCameraNode::imageSubscribedCallback, this, stream_index);
+      ros::SubscriberStatusCallback image_unsubscribed_cb = boost::bind(
+          &OBCameraNode::imageUnsubscribedCallback, this, stream_index);
       image_publishers_[stream_index] = nh_.advertise<sensor_msgs::Image>(
           name + "/image_raw", 1, image_subscribed_cb, image_unsubscribed_cb);
     }
   }
 }
 
-void OBCameraNode::publishStaticTF(const ros::Time& t, const tf2::Vector3& trans,
-                                   const tf2::Quaternion& q, const std::string& from,
-                                   const std::string& to) {
+void OBCameraNode::publishStaticTF(const ros::Time &t,
+                                   const tf2::Vector3 &trans,
+                                   const tf2::Quaternion &q,
+                                   const std::string &from,
+                                   const std::string &to) {
   geometry_msgs::TransformStamped msg;
   msg.header.stamp = t;
   msg.header.frame_id = from;
@@ -605,10 +646,10 @@ void OBCameraNode::calcAndPublishStaticTransform() {
   quaternion_optical.setRPY(-M_PI / 2, 0.0, -M_PI / 2);
   tf2::Vector3 zero_trans(0, 0, 0);
   std::vector<float> rotation, transition;
-  for (float& i : camera_params_->r2l_r) {
+  for (float &i : camera_params_->r2l_r) {
     rotation.emplace_back(i);
   }
-  for (float& i : camera_params_->r2l_t) {
+  for (float &i : camera_params_->r2l_t) {
     transition.emplace_back(i);
   }
   auto Q = rotationMatrixToQuaternion(rotation);
@@ -624,8 +665,10 @@ void OBCameraNode::calcAndPublishStaticTransform() {
   Q = quaternion_optical * Q * quaternion_optical.inverse();
   tf2::Vector3 trans(transition[0], transition[1], transition[2]);
   if ((!use_uvc_camera_ && !device_->hasSensor(openni::SENSOR_COLOR)) ||
-      std::isnan(transition[0]) || std::isnan(transition[1]) || std::isnan(transition[2])) {
-    ROS_WARN("No color sensor found or transition is invalid , setting translation to 0");
+      std::isnan(transition[0]) || std::isnan(transition[1]) ||
+      std::isnan(transition[2])) {
+    ROS_WARN("No color sensor found or transition is invalid , setting "
+             "translation to 0");
     trans[0] = 0;
     trans[1] = 0;
     trans[2] = 0;
@@ -635,27 +678,31 @@ void OBCameraNode::calcAndPublishStaticTransform() {
   Q = transform.getRotation();
   trans = transform.getOrigin();
   auto tf_timestamp = ros::Time::now();
-  publishStaticTF(tf_timestamp, zero_trans, quaternion_optical, frame_id_[COLOR],
-                  optical_frame_id_[COLOR]);
-  publishStaticTF(tf_timestamp, zero_trans, quaternion_optical, frame_id_[DEPTH],
-                  optical_frame_id_[DEPTH]);
-  publishStaticTF(tf_timestamp, zero_trans, quaternion_optical, frame_id_[INFRA1],
-                  optical_frame_id_[INFRA1]);
-  publishStaticTF(tf_timestamp, zero_trans, zero_rot, base_frame_id_, frame_id_[DEPTH]);
-  publishStaticTF(tf_timestamp, zero_trans, zero_rot, base_frame_id_, frame_id_[INFRA1]);
+  publishStaticTF(tf_timestamp, zero_trans, quaternion_optical,
+                  frame_id_[COLOR], optical_frame_id_[COLOR]);
+  publishStaticTF(tf_timestamp, zero_trans, quaternion_optical,
+                  frame_id_[DEPTH], optical_frame_id_[DEPTH]);
+  publishStaticTF(tf_timestamp, zero_trans, quaternion_optical,
+                  frame_id_[INFRA1], optical_frame_id_[INFRA1]);
+  publishStaticTF(tf_timestamp, zero_trans, zero_rot, base_frame_id_,
+                  frame_id_[DEPTH]);
+  publishStaticTF(tf_timestamp, zero_trans, zero_rot, base_frame_id_,
+                  frame_id_[INFRA1]);
   publishStaticTF(tf_timestamp, trans, Q, base_frame_id_, frame_id_[COLOR]);
 }
 
 void OBCameraNode::publishDynamicTransforms() {
-  ROS_WARN("Publishing dynamic camera transforms (/tf) at %g Hz", tf_publish_rate_);
+  ROS_WARN("Publishing dynamic camera transforms (/tf) at %g Hz",
+           tf_publish_rate_);
   static std::mutex mu;
   std::unique_lock<std::mutex> lock(mu);
   while (ros::ok() && is_running_) {
-    tf_cv_.wait_for(lock, std::chrono::milliseconds((int)(1000.0 / tf_publish_rate_)),
+    tf_cv_.wait_for(lock,
+                    std::chrono::milliseconds((int)(1000.0 / tf_publish_rate_)),
                     [this] { return (!(is_running_)); });
     {
       auto t = ros::Time::now();
-      for (auto& msg : static_tf_msgs_) {
+      for (auto &msg : static_tf_msgs_) {
         msg.header.stamp = t;
       }
       CHECK_NOTNULL(dynamic_tf_broadcaster_.get());
@@ -668,12 +715,14 @@ void OBCameraNode::publishStaticTransforms() {
   if (!publish_tf_) {
     return;
   }
-  static_tf_broadcaster_ = std::make_unique<tf2_ros::StaticTransformBroadcaster>();
+  static_tf_broadcaster_ =
+      std::make_unique<tf2_ros::StaticTransformBroadcaster>();
   dynamic_tf_broadcaster_ = std::make_unique<tf2_ros::TransformBroadcaster>();
   calcAndPublishStaticTransform();
   if (tf_publish_rate_ > 0) {
     CHECK(tf_thread_ == nullptr);
-    tf_thread_ = std::make_shared<std::thread>([this]() { this->publishDynamicTransforms(); });
+    tf_thread_ = std::make_shared<std::thread>(
+        [this]() { this->publishDynamicTransforms(); });
   } else {
     CHECK_NOTNULL(static_tf_broadcaster_.get());
     static_tf_broadcaster_->sendTransform(static_tf_msgs_);
@@ -681,11 +730,13 @@ void OBCameraNode::publishStaticTransforms() {
 }
 
 void OBCameraNode::setImageRegistrationMode(bool data) {
-  if (!device_->isImageRegistrationModeSupported(openni::IMAGE_REGISTRATION_DEPTH_TO_COLOR)) {
+  if (!device_->isImageRegistrationModeSupported(
+          openni::IMAGE_REGISTRATION_DEPTH_TO_COLOR)) {
     ROS_WARN_STREAM("Current do not support IMAGE_REGISTRATION_DEPTH_TO_COLOR");
     return;
   }
-  auto mode = data ? openni::IMAGE_REGISTRATION_DEPTH_TO_COLOR : openni::IMAGE_REGISTRATION_OFF;
+  auto mode = data ? openni::IMAGE_REGISTRATION_DEPTH_TO_COLOR
+                   : openni::IMAGE_REGISTRATION_OFF;
   auto rc = device_->setImageRegistrationMode(mode);
   if (rc != openni::STATUS_OK) {
     ROS_ERROR("Enabling image registration mode failed: \n%s\n",
@@ -693,35 +744,38 @@ void OBCameraNode::setImageRegistrationMode(bool data) {
   }
 }
 
-void OBCameraNode::onNewFrameCallback(const openni::VideoFrameRef& frame,
-                                      const stream_index_pair& stream_index) {
+void OBCameraNode::onNewFrameCallback(const openni::VideoFrameRef &frame,
+                                      const stream_index_pair &stream_index) {
   int width = frame.getWidth();
   int height = frame.getHeight();
   int dst_width = width;
   int dst_height = height;
   CHECK(images_.count(stream_index));
-  auto& image = images_.at(stream_index);
+  auto &image = images_.at(stream_index);
   if (image.size() != cv::Size(width, height)) {
     image.create(height, width, image.type());
   }
-  image.data = (uint8_t*)frame.getData();
+  image.data = (uint8_t *)frame.getData();
   auto pid = device_info_.getUsbProductId();
   if (stream_index == DEPTH && depth_align_ && depth_scale_ != 1) {
     dst_width = width * depth_scale_;
     dst_height = height * depth_scale_;
     cv::Mat dst(dst_height, dst_width, CV_16UC1);
-    cv::resize(image, dst, cv::Size(dst_width, dst_height), 0, 0, cv::INTER_NEAREST);
+    cv::resize(image, dst, cv::Size(dst_width, dst_height), 0, 0,
+               cv::INTER_NEAREST);
     image.create(dst_height, dst_width, image.type());
     image = dst;
 
-  } else if (stream_index == DEPTH && depth_align_ && pid == DABAI_DCW2_DEPTH_PID) {
+  } else if (stream_index == DEPTH && depth_align_ &&
+             pid == DABAI_DCW2_DEPTH_PID) {
     dst_width = width_[COLOR];
     dst_height = height_[COLOR];
     cv::Mat dst(dst_height, dst_width, CV_16UC1);
     dcw2Align(image, dst);
     image.create(dst_height, dst_width, image.type());
     image = dst;
-  } else if (stream_index == DEPTH && depth_align_ && (pid == DABAI_MAX_PRO_PID || pid == GEMINI_UW_PID)) {
+  } else if (stream_index == DEPTH && depth_align_ &&
+             (pid == DABAI_MAX_PRO_PID || pid == GEMINI_UW_PID)) {
     dst_width = width_[COLOR];
     dst_height = height_[COLOR];
     cv::Mat dst(dst_height, dst_width, CV_16UC1);
@@ -732,17 +786,19 @@ void OBCameraNode::onNewFrameCallback(const openni::VideoFrameRef& frame,
   if (flip_image_[stream_index]) {
     cv::flip(image, image, 1);
   }
-  auto image_msg =
-      *(cv_bridge::CvImage(std_msgs::Header(), encoding_.at(stream_index), image).toImageMsg());
+  auto image_msg = *(
+      cv_bridge::CvImage(std_msgs::Header(), encoding_.at(stream_index), image)
+          .toImageMsg());
   auto timestamp = ros::Time::now();
   image_msg.header.stamp = timestamp;
-  image_msg.header.frame_id =
-      depth_align_ ? depth_aligned_frame_id_[stream_index] : optical_frame_id_[stream_index];
+  image_msg.header.frame_id = depth_align_
+                                  ? depth_aligned_frame_id_[stream_index]
+                                  : optical_frame_id_[stream_index];
   image_msg.width = dst_width;
   image_msg.height = dst_height;
   image_msg.step = image_msg.width * unit_step_size_[stream_index];
   image_msg.is_bigendian = false;
-  auto& image_publisher = image_publishers_.at(stream_index);
+  auto &image_publisher = image_publishers_.at(stream_index);
   image_publisher.publish(image_msg);
   sensor_msgs::CameraInfo camera_info;
   if (stream_index == DEPTH) {
@@ -763,10 +819,11 @@ void OBCameraNode::onNewFrameCallback(const openni::VideoFrameRef& frame,
     ss << std::put_time(std::localtime(&now), "%Y%m%d_%H%M%S");
     auto current_path = boost::filesystem::current_path().string();
     auto fps = stream_video_mode_[stream_index].getFps();
-    std::string filename = current_path + "/image/" + stream_name_[stream_index] + "_" +
+    std::string filename = current_path + "/image/" +
+                           stream_name_[stream_index] + "_" +
                            std::to_string(image_msg.width) + "x" +
-                           std::to_string(image_msg.height) + "_" + std::to_string(fps) + "hz_" +
-                           ss.str() + ".png";
+                           std::to_string(image_msg.height) + "_" +
+                           std::to_string(fps) + "hz_" + ss.str() + ".png";
     if (!boost::filesystem::exists(current_path + "/image")) {
       boost::filesystem::create_directory(current_path + "/image");
     }
@@ -774,18 +831,20 @@ void OBCameraNode::onNewFrameCallback(const openni::VideoFrameRef& frame,
 
     ROS_INFO_STREAM("Saving image to :" << stream_index.first);
     if (stream_index.first == openni::SENSOR_DEPTH) {
-      auto image_to_save = cv_bridge::toCvCopy(image_msg, encoding_[stream_index])->image;
+      auto image_to_save =
+          cv_bridge::toCvCopy(image_msg, encoding_[stream_index])->image;
       cv::imwrite(filename, image_to_save);
     } else if (stream_index.first == openni::SENSOR_COLOR) {
       auto image_to_save =
-          cv_bridge::toCvCopy(image_msg, sensor_msgs::image_encodings::BGR8)->image;
+          cv_bridge::toCvCopy(image_msg, sensor_msgs::image_encodings::BGR8)
+              ->image;
       cv::imwrite(filename, image_to_save);
     } else if (stream_index.first == openni::SENSOR_IR) {
       cv::imwrite(filename, image);
     } else {
       ROS_ERROR_STREAM("Unsupported stream type: " << stream_index.first);
     }
-    
+
     save_images_[stream_index] = false;
   }
 }
@@ -793,8 +852,8 @@ void OBCameraNode::onNewFrameCallback(const openni::VideoFrameRef& frame,
 void OBCameraNode::setDepthColorSync(bool data) {
   auto rc = device_->setDepthColorSyncEnabled(data);
   if (rc != openni::STATUS_OK) {
-    ROS_ERROR_STREAM(
-        "Enabling depth color synchronization failed: " << openni::OpenNI::getExtendedError());
+    ROS_ERROR_STREAM("Enabling depth color synchronization failed: "
+                     << openni::OpenNI::getExtendedError());
   }
 }
 
@@ -808,14 +867,16 @@ void OBCameraNode::setDepthToColorResolution(int width, int height) {
   }
   if (width * 9 == height * 16) {
     // 16:9
-    auto status = device_->setProperty(XN_MODULE_PROPERTY_D2C_RESOLUTION, RGBResolution16_9);
+    auto status = device_->setProperty(XN_MODULE_PROPERTY_D2C_RESOLUTION,
+                                       RGBResolution16_9);
     if (status != openni::STATUS_OK) {
       ROS_ERROR_STREAM("setProperty XN_MODULE_PROPERTY_D2C_RESOLUTION "
                        << openni::OpenNI::getExtendedError());
     }
   } else if (width * 3 == height * 4) {
     // 4:3
-    auto status = device_->setProperty(XN_MODULE_PROPERTY_D2C_RESOLUTION, RGBResolution4_3);
+    auto status = device_->setProperty(XN_MODULE_PROPERTY_D2C_RESOLUTION,
+                                       RGBResolution4_3);
     if (status != openni::STATUS_OK) {
       ROS_ERROR_STREAM("setProperty XN_MODULE_PROPERTY_D2C_RESOLUTION "
                        << openni::OpenNI::getExtendedError());
@@ -825,7 +886,8 @@ void OBCameraNode::setDepthToColorResolution(int width, int height) {
   }
 }
 
-boost::optional<openni::VideoMode> OBCameraNode::lookupVideoModeFromDynConfig(int index) {
+boost::optional<openni::VideoMode>
+OBCameraNode::lookupVideoModeFromDynConfig(int index) {
   auto it = video_modes_lookup_table_.find(index);
   if (it != video_modes_lookup_table_.end()) {
     return it->second;
@@ -833,7 +895,8 @@ boost::optional<openni::VideoMode> OBCameraNode::lookupVideoModeFromDynConfig(in
   return {};
 }
 
-void OBCameraNode::reconfigureCallback(const AstraConfig& config, uint32_t level) {
+void OBCameraNode::reconfigureCallback(const AstraConfig &config,
+                                       uint32_t level) {
   (void)level;
   ROS_INFO_STREAM("Received configuration");
   if (!enable_reconfigure_) {
@@ -841,9 +904,10 @@ void OBCameraNode::reconfigureCallback(const AstraConfig& config, uint32_t level
     return;
   }
   auto json_data = nlohmann::json::parse(config.edited_video_modes);
-  auto edited_video_modes = json_data["enum"].get<std::vector<nlohmann::json>>();
+  auto edited_video_modes =
+      json_data["enum"].get<std::vector<nlohmann::json>>();
   video_modes_lookup_table_.clear();
-  for (const auto& json_mode : edited_video_modes) {
+  for (const auto &json_mode : edited_video_modes) {
     std::string name = json_mode["name"].get<std::string>();
     int value = json_mode["value"].get<int>();
     std::vector<std::string> arr;
@@ -860,32 +924,35 @@ void OBCameraNode::reconfigureCallback(const AstraConfig& config, uint32_t level
   auto ir_mode = lookupVideoModeFromDynConfig(config.ir_mode);
   if (ir_mode && device_->hasSensor(openni::SENSOR_IR)) {
     ROS_INFO_STREAM("Setting IR mode to " << ir_mode->getResolutionX() << "x"
-                                          << ir_mode->getResolutionY() << "@" << ir_mode->getFps()
-                                          << " fps");
+                                          << ir_mode->getResolutionY() << "@"
+                                          << ir_mode->getFps() << " fps");
     width_[INFRA1] = ir_mode->getResolutionX();
     height_[INFRA1] = ir_mode->getResolutionY();
     fps_[INFRA1] = ir_mode->getFps();
   }
   auto color_mode = lookupVideoModeFromDynConfig(config.color_mode);
   if (color_mode && device_->hasSensor(openni::SENSOR_COLOR)) {
-    ROS_INFO_STREAM("Setting color mode to " << color_mode->getResolutionX() << "x"
-                                             << color_mode->getResolutionY() << "@"
-                                             << color_mode->getFps() << " fps");
+    ROS_INFO_STREAM("Setting color mode to "
+                    << color_mode->getResolutionX() << "x"
+                    << color_mode->getResolutionY() << "@"
+                    << color_mode->getFps() << " fps");
     width_[COLOR] = color_mode->getResolutionX();
     height_[COLOR] = color_mode->getResolutionY();
     fps_[COLOR] = color_mode->getFps();
   }
   auto depth_mode = lookupVideoModeFromDynConfig(config.depth_mode);
   if (depth_mode && device_->hasSensor(openni::SENSOR_DEPTH)) {
-    ROS_INFO_STREAM("Setting depth mode to " << depth_mode->getResolutionX() << "x"
-                                             << depth_mode->getResolutionY() << "@"
-                                             << depth_mode->getFps() << " fps");
+    ROS_INFO_STREAM("Setting depth mode to "
+                    << depth_mode->getResolutionX() << "x"
+                    << depth_mode->getResolutionY() << "@"
+                    << depth_mode->getFps() << " fps");
     width_[DEPTH] = depth_mode->getResolutionX();
     height_[DEPTH] = depth_mode->getResolutionY();
     fps_[DEPTH] = depth_mode->getFps();
   }
   depth_align_ = config.depth_align;
-  if (depth_align_ && !device_->hasSensor(openni::SENSOR_COLOR) && !use_uvc_camera_) {
+  if (depth_align_ && !device_->hasSensor(openni::SENSOR_COLOR) &&
+      !use_uvc_camera_) {
     ROS_WARN("No color sensor found, depth align will be disabled");
     depth_align_ = false;
   }
@@ -900,16 +967,19 @@ void OBCameraNode::reconfigureCallback(const AstraConfig& config, uint32_t level
   ROS_INFO("Configuration applied");
 }
 
-void OBCameraNode::sendKeepAlive(const ros::TimerEvent& event) {
+void OBCameraNode::sendKeepAlive(const ros::TimerEvent &event) {
   (void)event;
   ROS_INFO_STREAM("Sending keep alive");
   openni::Status status;
   std::lock_guard<decltype(device_lock_)> lock(device_lock_);
-  status = device_->setProperty(XN_MODULE_PROPERTY_LASER_SECURE_KEEPALIVE, nullptr, 0);
+  status = device_->setProperty(XN_MODULE_PROPERTY_LASER_SECURE_KEEPALIVE,
+                                nullptr, 0);
   if (status != openni::STATUS_OK) {
     ROS_ERROR_STREAM("openni status " << status);
-    ROS_ERROR_STREAM("current errno " << errno << " system error string " << strerror(errno));
-    ROS_INFO("Sending keep alive Error: %s\n", openni::OpenNI::getExtendedError());
+    ROS_ERROR_STREAM("current errno " << errno << " system error string "
+                                      << strerror(errno));
+    ROS_INFO("Sending keep alive Error: %s\n",
+             openni::OpenNI::getExtendedError());
   } else {
     ROS_INFO("Sending keep alive success\n");
   }
@@ -918,26 +988,27 @@ void OBCameraNode::sendKeepAlive(const ros::TimerEvent& event) {
 void OBCameraNode::pollFrame() {
   openni::VideoFrameRef frame;
   while (run_poll_frame_thread_ && ros::ok()) {
-    std::unique_lock<decltype(poll_frame_thread_lock_)> lock(poll_frame_thread_lock_);
-    auto has_stream_started =
-        poll_frame_thread_cv_.wait_for(lock, std::chrono::milliseconds(1000), [this] {
-          return std::any_of(
-              IMAGE_STREAMS.begin(), IMAGE_STREAMS.end(),
-              [this](const stream_index_pair& stream_index) {
-                if (stream_started_[stream_index] && streams_[stream_index]->isValid()) {
-                  return true;
-                }
-                return false;
-              });
+    std::unique_lock<decltype(poll_frame_thread_lock_)> lock(
+        poll_frame_thread_lock_);
+    auto has_stream_started = poll_frame_thread_cv_.wait_for(
+        lock, std::chrono::milliseconds(1000), [this] {
+          return std::any_of(IMAGE_STREAMS.begin(), IMAGE_STREAMS.end(),
+                             [this](const stream_index_pair &stream_index) {
+                               if (stream_started_[stream_index] &&
+                                   streams_[stream_index]->isValid()) {
+                                 return true;
+                               }
+                               return false;
+                             });
         });
     if (!has_stream_started) {
       std::this_thread::sleep_for(std::chrono::milliseconds(1000));
       continue;
     }
-    openni::VideoStream* streams[3];
+    openni::VideoStream *streams[3];
     std::map<int, stream_index_pair> idx_map;
     int stream_count = 0;
-    for (const auto& stream_index : IMAGE_STREAMS) {
+    for (const auto &stream_index : IMAGE_STREAMS) {
       if (enable_[stream_index] && streams_[stream_index].get()) {
         streams[stream_count] = streams_[stream_index].get();
         idx_map[stream_count] = stream_index;
@@ -946,8 +1017,8 @@ void OBCameraNode::pollFrame() {
     }
     int ready_stream = -1;
     const static int timeout_ms(2000);
-    auto status =
-        openni::OpenNI::waitForAnyStream(streams, stream_count, &ready_stream, timeout_ms);
+    auto status = openni::OpenNI::waitForAnyStream(streams, stream_count,
+                                                   &ready_stream, timeout_ms);
     if (status != openni::STATUS_OK) {
       continue;
     }
@@ -955,7 +1026,8 @@ void OBCameraNode::pollFrame() {
     auto stream_index = idx_map[ready_stream];
     status = streams[ready_stream]->readFrame(&frame);
     if (status != openni::STATUS_OK) {
-      ROS_ERROR_STREAM("read " << stream_name_[stream_index] << " stream failed "
+      ROS_ERROR_STREAM("read " << stream_name_[stream_index]
+                               << " stream failed "
                                << openni::OpenNI::getExtendedError());
       continue;
     }
@@ -963,16 +1035,18 @@ void OBCameraNode::pollFrame() {
   }
 }
 
-void OBCameraNode::dcw2Align(const cv::Mat& src, cv::Mat& dst) {
+void OBCameraNode::dcw2Align(const cv::Mat &src, cv::Mat &dst) {
   int color_width = width_[COLOR];
   int color_height = height_[COLOR];
   int depth_width = width_[DEPTH];
   int depth_height = height_[DEPTH];
-  if (color_width == 640 && color_height == 360 && depth_width == 640 && depth_height == 400) {
+  if (color_width == 640 && color_height == 360 && depth_width == 640 &&
+      depth_height == 400) {
     // take src up 360 line
     cv::Mat src_up = src(cv::Rect(0, 0, 640, 360));
     dst = src_up;
-  } else if (color_width == 640 && color_height == 360 && depth_width == 540 && depth_height == 400) {
+  } else if (color_width == 640 && color_height == 360 && depth_width == 540 &&
+             depth_height == 400) {
     // 创建一个新的 640x400 的图像
     cv::Mat newImage(400, 640, src.type(), cv::Scalar(0));
     // 定义原始图像在新图像中的位置
@@ -982,7 +1056,8 @@ void OBCameraNode::dcw2Align(const cv::Mat& src, cv::Mat& dst) {
 
     cv::Mat src_up = newImage(cv::Rect(0, 0, 640, 360));
     dst = src_up;
-  } else if (color_width == 640 && color_height == 480 && depth_width == 640 && depth_height == 400) {
+  } else if (color_width == 640 && color_height == 480 && depth_width == 640 &&
+             depth_height == 400) {
     // take src up 480x360, then upscale to 640x680
     cv::Mat src_up = src(cv::Rect(80, 0, 480, 360));
     cv::resize(src_up, dst, cv::Size(640, 480), 0, 0, cv::INTER_NEAREST);
@@ -1009,28 +1084,31 @@ void OBCameraNode::dcw2Align(const cv::Mat& src, cv::Mat& dst) {
     cv::resize(src_up, dst, cv::Size(320, 240), 0, 0, cv::INTER_NEAREST);
   } else {
     ROS_ERROR_STREAM("Not support D2C config  color_width "
-                     << color_width << " color_height " << color_height << " depth_width "
-                     << depth_width << " depth_height " << depth_height);
+                     << color_width << " color_height " << color_height
+                     << " depth_width " << depth_width << " depth_height "
+                     << depth_height);
     return;
   }
 }
 
-void OBCameraNode::maxProAlign(const cv::Mat& src, cv::Mat& dst) {
+void OBCameraNode::maxProAlign(const cv::Mat &src, cv::Mat &dst) {
   int color_width = width_[COLOR];
   int color_height = height_[COLOR];
   int depth_width = width_[DEPTH];
   int depth_height = height_[DEPTH];
-  if (color_width == 640 && color_height == 480 && depth_width == 640 && depth_height == 400) {
+  if (color_width == 640 && color_height == 480 && depth_width == 640 &&
+      depth_height == 400) {
     // take src up 480x360, then upscale to 640x680
     cv::Mat src_up = src(cv::Rect(96, 32, 448, 336));
     cv::resize(src_up, dst, cv::Size(640, 480), 0, 0, cv::INTER_NEAREST);
 
   } else {
     ROS_ERROR_STREAM("Not support D2C config  color_width "
-                     << color_width << " color_height " << color_height << " depth_width "
-                     << depth_width << " depth_height " << depth_height);
+                     << color_width << " color_height " << color_height
+                     << " depth_width " << depth_width << " depth_height "
+                     << depth_height);
     return;
   }
 }
 
-}  // namespace astra_camera
+} // namespace astra_camera

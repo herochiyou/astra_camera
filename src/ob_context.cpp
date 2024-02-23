@@ -29,7 +29,8 @@ std::vector<openni::DeviceInfo> Context::queryDeviceList() {
   if (first_time_query_) {
     openni::Array<openni::DeviceInfo> device_info_list;
     openni::OpenNI::enumerateDevices(&device_info_list);
-    ROS_INFO_STREAM("Found " << device_info_list.getSize() << " devices");
+    LOG(ERROR) << "Found :(" << device_info_list.getSize() << "),devices";
+    // ROS_INFO_STREAM("Found " << device_info_list.getSize() << " devices");
     for (int i = 0; i < device_info_list.getSize(); ++i) {
       device_list.emplace_back(device_info_list[i]);
       std::lock_guard<decltype(mutex_)> lock(mutex_);
@@ -38,7 +39,7 @@ std::vector<openni::DeviceInfo> Context::queryDeviceList() {
     first_time_query_ = false;
   } else {
     std::lock_guard<decltype(mutex_)> lock(mutex_);
-    for (auto& device_info : device_info_list_) {
+    for (auto &device_info : device_info_list_) {
       device_list.emplace_back(device_info.second);
     }
   }
@@ -51,23 +52,24 @@ Context::~Context() {
   openni::OpenNI::removeDeviceStateChangedListener(this);
 }
 
-void Context::onDeviceStateChanged(const openni::DeviceInfo* device_info,
+void Context::onDeviceStateChanged(const openni::DeviceInfo *device_info,
                                    openni::DeviceState state) {
-  ROS_INFO_STREAM("Device " << device_info->getUri() << " state changed to " << state);
+  ROS_INFO_STREAM("Device " << device_info->getUri() << " state changed to "
+                            << state);
 }
 
-void Context::onDeviceConnected(const openni::DeviceInfo* device_info) {
+void Context::onDeviceConnected(const openni::DeviceInfo *device_info) {
   ROS_INFO_STREAM("Context::onDeviceConnected");
   std::lock_guard<decltype(mutex_)> lock(mutex_);
   device_info_list_[device_info->getUri()] = *device_info;
   ROS_INFO_STREAM("Context::onDeviceConnected done");
 }
 
-void Context::onDeviceDisconnected(const openni::DeviceInfo* device_info) {
+void Context::onDeviceDisconnected(const openni::DeviceInfo *device_info) {
   ROS_INFO_STREAM("Context::onDeviceDisconnected");
   std::lock_guard<decltype(mutex_)> lock(mutex_);
   device_disconnected_cb_(device_info);
   ROS_INFO_STREAM("Context::onDeviceDisconnected done.");
   device_info_list_.erase(device_info->getUri());
 }
-}  // namespace astra_camera
+} // namespace astra_camera

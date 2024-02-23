@@ -13,7 +13,7 @@
 
 #include "astra_camera/ob_context.h"
 
-void DeviceConnectedCallback(const openni::DeviceInfo* device_info) {
+void DeviceConnectedCallback(const openni::DeviceInfo *device_info) {
   std::cout << "Device connected: " << device_info->getName() << std::endl;
   auto device = std::make_shared<openni::Device>();
   auto uri = device_info->getUri();
@@ -21,19 +21,26 @@ void DeviceConnectedCallback(const openni::DeviceInfo* device_info) {
   device->open(uri);
   char serial_number[64];
   int data_size = sizeof(serial_number);
-  device->getProperty(openni::OBEXTENSION_ID_SERIALNUMBER, serial_number, &data_size);
+  device->getProperty(openni::OBEXTENSION_ID_SERIALNUMBER, serial_number,
+                      &data_size);
   std::cout << "Serial number: " << serial_number << std::endl;
   device->close();
 }
 
 int main() {
+  google::InitGoogleLogging(argv[0]);
+  google::SetStderrLogging(google::GLOG_INFO);
+  FLAGS_colorlogtostderr = true;
   openni::OpenNI::initialize();
-  auto disconnected_cb = [](const openni::DeviceInfo* device_info) {
-    std::cout << "device " << device_info->getUri() << " disconnected" << std::endl;
+
+  auto disconnected_cb = [](const openni::DeviceInfo *device_info) {
+    LOG(ERROR) << "Device:(" << device_info->getUri() << ").";
+    std::cout << "device " << device_info->getUri() << " disconnected"
+              << std::endl;
   };
   auto context = std::make_unique<astra_camera::Context>(disconnected_cb);
   auto device_list = context->queryDeviceList();
-  for (auto& device_info : device_list) {
+  for (auto &device_info : device_list) {
     DeviceConnectedCallback(&device_info);
   }
   openni::OpenNI::shutdown();

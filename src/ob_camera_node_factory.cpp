@@ -280,7 +280,7 @@ void OBCameraNodeFactory::queryDevice() {
     if (!device_connected_) {
 
       auto device_info_list = context_->queryDeviceList();
-      LOG_EVERY_N(ERROR, 1000)
+      LOG_EVERY_N(ERROR, 1)
           << "Query device,size:(" << device_info_list.size() << ").";
       sleep(1);
       // std::this_thread::sleep_for(std::chrono::milliseconds(100));

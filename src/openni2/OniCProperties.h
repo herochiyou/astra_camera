@@ -20,7 +20,7 @@
  *****************************************************************************/
 #ifndef ONICPROPERTIES_H
 #define ONICPROPERTIES_H
-namespace openni {
+// namespace openni {
 // Device properties
 enum {
   ONI_DEVICE_PROPERTY_FIRMWARE_VERSION = 0,   // By implementation
@@ -65,6 +65,6 @@ enum {
 enum {
   ONI_DEVICE_COMMAND_SEEK = 1, // OniSeek
 };
-} // namespace openni
+// } // namespace openni
 
 #endif // ONICPROPERTIES_H

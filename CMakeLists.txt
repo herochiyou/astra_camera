@@ -209,9 +209,9 @@ target_link_libraries(${PROJECT_NAME}_node
 )
 
 add_executable(list_devices_node
-  ${OPENNI_SRCS}
-  ${XN_SRCS}
-  ${FORMATS_SRCS}
+  # ${OPENNI_SRCS}
+  # ${XN_SRCS}
+  # ${FORMATS_SRCS}
   src/list_devices_node.cpp
 )
 target_include_directories(list_devices_node PUBLIC
@@ -227,8 +227,8 @@ target_include_directories(list_devices_node PUBLIC
 target_link_libraries(list_devices_node
   # -lOpenNI2
   # -L${ORBBEC_OPENNI2_REDIST}
-  -ludev
   ${PROJECT_NAME}
+  -ludev
   ${catkin_LIBRARIES}
   ${CMAKE_THREAD_LIBS_INIT}
   ${OpenCV_LIBS}

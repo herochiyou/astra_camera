@@ -38,7 +38,7 @@ namespace astra_camera {
 OBCameraNodeFactory::OBCameraNodeFactory(ros::NodeHandle &nh,
                                          ros::NodeHandle &nh_private)
     : nh_(nh), nh_private_(nh_private) {
-  ROS_INFO_STREAM("OBCameraNodeFactory::OBCameraNodeFactory");
+  LOG(ERROR) << "OBCameraNodeFactory::OBCameraNodeFactory";
   init();
 }
 

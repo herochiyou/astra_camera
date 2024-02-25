@@ -31,8 +31,9 @@ int main() {
   google::InitGoogleLogging(argv[0]);
   google::SetStderrLogging(google::GLOG_INFO);
   FLAGS_colorlogtostderr = true;
+  LOG(ERROR) << "-1";
   openni::OpenNI::initialize();
-
+  LOG(ERROR) << "0";
   auto disconnected_cb = [](const openni::DeviceInfo *device_info) {
     LOG(ERROR) << "Device:(" << device_info->getUri() << ").";
     std::cout << "device " << device_info->getUri() << " disconnected"

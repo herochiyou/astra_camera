@@ -28,6 +28,7 @@ void DeviceConnectedCallback(const openni::DeviceInfo *device_info) {
 
 int main() {
   char **argv;
+  LOG(ERROR) << "-2";
   google::InitGoogleLogging(argv[0]);
   google::SetStderrLogging(google::GLOG_INFO);
   FLAGS_colorlogtostderr = true;

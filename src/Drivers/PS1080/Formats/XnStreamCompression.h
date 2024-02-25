@@ -56,7 +56,7 @@ typedef struct XnLibJpegErrorMgr {
   jmp_buf setjmpBuffer;
 } XnLibJpegErrorMgr;
 
-XN_PRAGMA_STOP_DISABLED_WARNING_SECTION;
+XN_PRAGMA_STOP_DISABLED_WARNING_SECTION
 
 typedef struct XnStreamCompJPEGContext {
   jpeg_compress_struct jCompStruct;

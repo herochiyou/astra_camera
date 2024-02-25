@@ -129,6 +129,7 @@ void OBCameraNodeFactory::startDevice(
   }
   CHECK_NOTNULL(device_.get());
   try {
+    LOG(ERROR) << "Try make unique ob camera node.";
     ob_camera_node_ = std::make_unique<OBCameraNode>(nh_, nh_private_, device_,
                                                      use_uvc_camera_);
   } catch (const std::exception &e) {

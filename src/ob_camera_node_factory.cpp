@@ -149,7 +149,7 @@ void OBCameraNodeFactory::startDevice(
     device_uri_ = "";
     device_connected_ = false;
     has_exception_ = true;
-    LOG(ERROR) << "Device is Not Connected, return";
+    LOG(ERROR) << "Device is Not Connected, return.";
     // ROS_ERROR_STREAM("Device is Not Connected, return");
     return;
   }
@@ -159,6 +159,7 @@ void OBCameraNodeFactory::startDevice(
 
 void OBCameraNodeFactory::onDeviceConnected(
     const openni::DeviceInfo *device_info) {
+  LOG(ERROR) << "Connected.";
   ROS_INFO_STREAM_THROTTLE(1, "Device connected: (name, "
                                   << device_info->getName() << ") (uri, "
                                   << device_info->getUri() << ") (vendor, "

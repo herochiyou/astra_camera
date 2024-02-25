@@ -38,11 +38,15 @@ int main() {
     std::cout << "device " << device_info->getUri() << " disconnected"
               << std::endl;
   };
+  LOG(ERROR) << "1";
   auto context = std::make_unique<astra_camera::Context>(disconnected_cb);
+  LOG(ERROR) << "2";
   auto device_list = context->queryDeviceList();
+  LOG(ERROR) << "3";
   for (auto &device_info : device_list) {
     DeviceConnectedCallback(&device_info);
   }
+  LOG(ERROR) << "4";
   openni::OpenNI::shutdown();
   return 0;
 }

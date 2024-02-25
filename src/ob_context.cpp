@@ -11,6 +11,7 @@
 /**************************************************************************/
 
 #include <astra_camera/ob_context.h>
+#include <glog/logging.h>
 
 namespace astra_camera {
 Context::Context(DeviceDisconnectedCb device_disconnected_cb)

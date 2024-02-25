@@ -94,7 +94,7 @@ void OBCameraNodeFactory::init() {
     exit(-1);
   }
   use_uvc_camera_ = nh_private_.param<bool>("use_uvc_camera", false);
-  LOG(ERROR) << "Is Use_uvc_camera:(" << use_uvc_camera << ")";
+  LOG(ERROR) << "Is Use_uvc_camera:(" << use_uvc_camera_ << ")";
   serial_number_ = nh_private_.param<std::string>("serial_number", "");
   LOG(ERROR) << "Serial number:(" << serial_number_ << ")";
   device_num_ = nh_private_.param<int>("device_num", 1);
@@ -113,7 +113,7 @@ void OBCameraNodeFactory::init() {
   CHECK(check_connection_timer_.isValid());
   query_device_thread_ =
       std::make_unique<std::thread>([this] { this->queryDevice(); });
-  LOG(ERROR) << "init Done";
+  LOG(ERROR) << "Initial is done.";
 }
 
 void OBCameraNodeFactory::startDevice(

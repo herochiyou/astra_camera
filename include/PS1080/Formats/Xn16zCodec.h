@@ -18,37 +18,36 @@
 *  limitations under the License.                                            *
 *                                                                            *
 *****************************************************************************/
-#ifndef _ONI_DRIVER_TYPES_H_
-#define _ONI_DRIVER_TYPES_H_
+#ifndef __XN_16Z_CODEC_H__
+#define __XN_16Z_CODEC_H__
 
-#include <OniCTypes.h>
-#include <stdarg.h>
+//---------------------------------------------------------------------------
+// Includes
+//---------------------------------------------------------------------------
+#include "XnCodecBase.h"
+#include <Formats/XnStreamCompression.h>
 
-#define ONI_STREAM_PROPERTY_PRIVATE_BASE XN_MAX_UINT16
-
-typedef struct
+//---------------------------------------------------------------------------
+// Types
+//---------------------------------------------------------------------------
+class Xn16zCodec : public XnCodecBase
 {
-	int dataSize;
-	void* data;
-} OniGeneralBuffer;
+public:
+	virtual XnCompressionFormats GetCompressionFormat() const { return XN_COMPRESSION_16Z; }
 
-/////// DriverServices
-struct OniDriverServices
-{
-	void* driverServices;
-	void (ONI_CALLBACK_TYPE* errorLoggerAppend)(void* driverServices, const char* format, va_list args);
-	void (ONI_CALLBACK_TYPE* errorLoggerClear)(void* driverServices);
-	void (ONI_CALLBACK_TYPE* log)(void* driverServices, int severity, const char* file, int line, const char* mask, const char* message);
+	virtual XnFloat GetWorseCompressionRatio() const { return XN_STREAM_COMPRESSION_DEPTH16Z_WORSE_RATIO; }
+	virtual XnUInt32 GetOverheadSize() const { return 0; }
+
+protected:
+	virtual XnStatus CompressImpl(const XnUChar* pData, XnUInt32 nDataSize, XnUChar* pCompressedData, XnUInt32* pnCompressedDataSize)
+	{
+		return XnStreamCompressDepth16Z((XnUInt16*)pData, nDataSize, pCompressedData, pnCompressedDataSize);
+	}
+
+	virtual XnStatus DecompressImpl(const XnUChar* pCompressedData, XnUInt32 nCompressedDataSize, XnUChar* pData, XnUInt32* pnDataSize)
+	{
+		return XnStreamUncompressDepth16Z(pCompressedData, nCompressedDataSize, (XnUInt16*)pData, pnDataSize);
+	}
 };
 
-struct OniStreamServices
-{
-	void* streamServices;
-	int (ONI_CALLBACK_TYPE* getDefaultRequiredFrameSize)(void* streamServices);
-	OniFrame* (ONI_CALLBACK_TYPE* acquireFrame)(void* streamServices); // returns a frame with size corresponding to getRequiredFrameSize()
-	void (ONI_CALLBACK_TYPE* addFrameRef)(void* streamServices, OniFrame* pframe);
-	void (ONI_CALLBACK_TYPE* releaseFrame)(void* streamServices, OniFrame* pframe);
-};
-
-
-#endif // _ONI_DRIVER_TYPES_H_
+#endif //__XN_16Z_CODEC_H__

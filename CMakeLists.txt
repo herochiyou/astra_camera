@@ -156,7 +156,7 @@ target_include_directories(${PROJECT_NAME} PUBLIC
 )
 target_link_libraries(${PROJECT_NAME}
   # -lOpenNI2
-  -L${ORBBEC_OPENNI2_REDIST}
+  # -L${ORBBEC_OPENNI2_REDIST}
   ${catkin_LIBRARIES}
   ${CMAKE_THREAD_LIBS_INIT}
   ${OpenCV_LIBS}

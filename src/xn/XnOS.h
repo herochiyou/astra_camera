@@ -310,7 +310,7 @@ XN_C_API XnStatus XN_C_DECL xnOSGetInfo(xnOSInfo *pOSInfo);
 #if XN_PLATFORM_VAARGS_TYPE == XN_PLATFORM_USE_WIN32_VAARGS_STYLE
 #define XN_NEW(type, ...) new type(__VA_ARGS__)
 #elif XN_PLATFORM_VAARGS_TYPE == XN_PLATFORM_USE_GCC_VAARGS_STYLE
-// #define XN_NEW(type, ...)		new type(__VA_ARGS__)
+#define XN_NEW(type, ...) new type(__VA_ARGS__)
 #elif XN_PLATFORM_VAARGS_TYPE == XN_PLATFORM_USE_ARC_VAARGS_STYLE
 #define XN_NEW(type, arg...) new type(arg)
 #else

@@ -227,6 +227,7 @@ target_include_directories(list_devices_node PUBLIC
 target_link_libraries(list_devices_node
   # -lOpenNI2
   # -L${ORBBEC_OPENNI2_REDIST}
+  -ludev
   ${PROJECT_NAME}
   ${catkin_LIBRARIES}
   ${CMAKE_THREAD_LIBS_INIT}

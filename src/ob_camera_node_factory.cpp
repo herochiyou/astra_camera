@@ -94,9 +94,11 @@ void OBCameraNodeFactory::init() {
     exit(-1);
   }
   use_uvc_camera_ = nh_private_.param<bool>("use_uvc_camera", false);
+  LOG(ERROR) << "Is Use_uvc_camera:(" << use_uvc_camera << ")";
   serial_number_ = nh_private_.param<std::string>("serial_number", "");
   LOG(ERROR) << "Serial number:(" << serial_number_ << ")";
   device_num_ = nh_private_.param<int>("device_num", 1);
+  LOG(ERROR) << "Device number:(" << device_num_ << ")";
   connection_delay_ = nh_private_.param<int>("connection_delay", 100);
   auto disconnected_cb = [this](const openni::DeviceInfo *device_info) {
     this->onDeviceDisconnected(device_info);

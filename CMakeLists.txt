@@ -156,9 +156,12 @@ add_library(${PROJECT_NAME}
 )
 
 target_include_directories(${PROJECT_NAME} PUBLIC
+
   $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>
+  ${CMAKE_CURRENT_SOURCE_DIR}/include/openni2/
+  ${CMAKE_CURRENT_SOURCE_DIR}/include/xn/
   ${catkin_INCLUDE_DIRS}
   ${Boost_INCLUDE_DIRS}
   ${libuvc_INCLUDE_DIRS}

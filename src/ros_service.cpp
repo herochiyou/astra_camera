@@ -423,7 +423,7 @@ std::string OBCameraNode::getSerialNumber() {
   char serial_number_str[128] = {0};
   int data_size = sizeof(serial_number_str);
   std::lock_guard<decltype(device_lock_)> lock(device_lock_);
-  device_->getProperty(openni::OBEXTENSION_ID_SERIALNUMBER,
+  device_->getProperty(OBEXTENSION_ID_SERIALNUMBER,
                        (uint8_t *)&serial_number_str, &data_size);
   return serial_number_str;
 }
@@ -581,8 +581,8 @@ bool OBCameraNode::getDeviceInfoCallback(GetDeviceInfoRequest &request,
   response.info.vid = device_info.getUsbVendorId();
   char serial_number[64];
   int data_size = sizeof(serial_number);
-  auto rc = device_->getProperty(openni::OBEXTENSION_ID_SERIALNUMBER,
-                                 serial_number, &data_size);
+  auto rc = device_->getProperty(OBEXTENSION_ID_SERIALNUMBER, serial_number,
+                                 &data_size);
   if (rc == openni::STATUS_OK) {
     response.info.serial_number = serial_number;
   } else {

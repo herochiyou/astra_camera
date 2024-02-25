@@ -181,7 +181,7 @@ void OBCameraNodeFactory::onDeviceConnected(
   } else {
     char serial_number[64];
     int data_size = sizeof(serial_number);
-    rc = device->getProperty(openni::OBEXTENSION_ID_SERIALNUMBER, serial_number,
+    rc = device->getProperty(OBEXTENSION_ID_SERIALNUMBER, serial_number,
                              &data_size);
     if (rc != openni::STATUS_OK) {
       ROS_ERROR_STREAM("Failed to get serial number: "

@@ -21,8 +21,7 @@ void DeviceConnectedCallback(const openni::DeviceInfo *device_info) {
   device->open(uri);
   char serial_number[64];
   int data_size = sizeof(serial_number);
-  device->getProperty(openni::OBEXTENSION_ID_SERIALNUMBER, serial_number,
-                      &data_size);
+  device->getProperty(OBEXTENSION_ID_SERIALNUMBER, serial_number, &data_size);
   std::cout << "Serial number: " << serial_number << std::endl;
   device->close();
 }

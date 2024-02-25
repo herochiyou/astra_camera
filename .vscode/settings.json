@@ -2,6 +2,7 @@
     "files.associations": {
         "*.bb": "makefile",
         "ostream": "cpp",
-        "dense": "cpp"
+        "dense": "cpp",
+        "mutex": "cpp"
     }
 }

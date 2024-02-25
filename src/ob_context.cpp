@@ -26,10 +26,11 @@ Context::Context(DeviceDisconnectedCb device_disconnected_cb)
 
 std::vector<openni::DeviceInfo> Context::queryDeviceList() {
   std::vector<openni::DeviceInfo> device_list;
+  LOG(ERROR) << "first:(" << first_time_query_ << ").";
   if (first_time_query_) {
     openni::Array<openni::DeviceInfo> device_info_list;
     openni::OpenNI::enumerateDevices(&device_info_list);
-    LOG(ERROR) << "Found :(" << device_info_list.getSize() << "),devices";
+    LOG(ERROR) << "Found :(" << device_info_list.getSize() << ") devices";
     // ROS_INFO_STREAM("Found " << device_info_list.getSize() << " devices");
     for (int i = 0; i < device_info_list.getSize(); ++i) {
       device_list.emplace_back(device_info_list[i]);

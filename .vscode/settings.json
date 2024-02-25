@@ -5,6 +5,15 @@
         "dense": "cpp",
         "mutex": "cpp",
         "complex": "cpp",
-        "random": "cpp"
+        "random": "cpp",
+        "any": "cpp",
+        "array": "cpp",
+        "functional": "cpp",
+        "istream": "cpp",
+        "tuple": "cpp",
+        "type_traits": "cpp",
+        "utility": "cpp",
+        "chrono": "cpp",
+        "ratio": "cpp"
     }
 }

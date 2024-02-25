@@ -26,7 +26,7 @@ Context::Context(DeviceDisconnectedCb device_disconnected_cb)
 
 std::vector<openni::DeviceInfo> Context::queryDeviceList() {
   std::vector<openni::DeviceInfo> device_list;
-  LOG(ERROR) << "first:(" << first_time_query_ << ").";
+  LOG(ERROR) << "First:(" << first_time_query_ << ").";
   if (first_time_query_) {
     openni::Array<openni::DeviceInfo> device_info_list;
     openni::OpenNI::enumerateDevices(&device_info_list);

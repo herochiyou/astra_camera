@@ -362,11 +362,11 @@ void Context::unregisterDeviceStateChangedCallback(OniCallbackHandle handle) {
 
 OniStatus Context::getDeviceList(OniDeviceInfo **pDevices, int *pDeviceCount) {
   m_cs.Lock();
-  LOG(ERROR) << "Device count:(" << m_devices.Size() << ").";
+  LOG(ERROR) << "Device count:(" << m_devices.Size() << ")1.";
   *pDeviceCount = m_devices.Size();
   *pDevices = XN_NEW_ARR(OniDeviceInfo, *pDeviceCount);
   int idx = 0;
-  LOG(ERROR) << "Device count:(" << m_devices.Size() << ").";
+  LOG(ERROR) << "Device count:(" << m_devices.Size() << ")2.";
   for (xnl::List<Device *>::ConstIterator iter = m_devices.Begin();
        iter != m_devices.End(); ++iter, ++idx) {
     xnOSMemCopy((*pDevices) + idx, (*iter)->getInfo(), sizeof(OniDeviceInfo));

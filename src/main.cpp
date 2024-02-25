@@ -17,6 +17,7 @@ using namespace astra_camera;
 int main(int argc, char **argv) {
   google::InitGoogleLogging(argv[0]);
   google::SetStderrLogging(google::GLOG_INFO);
+  FLAGS_colorlogtostderr = true;
   LOG(ERROR) << "Starting camera node...";
   ros::init(argc, argv, "astra_camera_node");
   ros::NodeHandle nh;

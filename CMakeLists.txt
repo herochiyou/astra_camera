@@ -155,7 +155,7 @@ target_include_directories(${PROJECT_NAME} PUBLIC
   ${RK_RGA_INCLUDE_DIRS}
 )
 target_link_libraries(${PROJECT_NAME}
-  -lOpenNI2
+  # -lOpenNI2
   -L${ORBBEC_OPENNI2_REDIST}
   ${catkin_LIBRARIES}
   ${CMAKE_THREAD_LIBS_INIT}

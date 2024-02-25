@@ -131,11 +131,17 @@ link_directories(
   ${catkin_LINK_DIRS}
   ${OpenCV_LIBS})
 
+file(GLOB_RECURSE XN_SRCS "src/xn/Linux/*.cpp")
+message("XN_SRCS:${XN_SRCS}"  );
+
 add_library(${PROJECT_NAME}
   src/xn/Linux/XnLinuxSharedLibs.cpp
   src/xn/Linux/XnLinuxThreads.cpp
   src/xn/Linux/XnLinuxFiles.cpp
   src/xn/Linux/XnLinuxTime.cpp
+
+
+
 
   src/openni2/OniContext.cpp
   src/openni2/OniDataRecords.cpp

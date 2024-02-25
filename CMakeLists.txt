@@ -132,6 +132,7 @@ link_directories(
   ${OpenCV_LIBS})
 
 add_library(${PROJECT_NAME}
+  src/openni2/*.cpp
   src/point_cloud_proc/point_cloud_xyz.cpp
   src/point_cloud_proc/point_cloud_xyzrgb.cpp
   src/d2c_viewer.cpp

@@ -10,7 +10,7 @@
 /*                                                                        */
 /**************************************************************************/
 #pragma once
-#include <glog/logging.h>
+
 #include <mutex>
 #include <openni2/OpenNI.h>
 #include <ros/ros.h>

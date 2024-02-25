@@ -143,6 +143,7 @@ add_library(${PROJECT_NAME}
   src/openni2/OniStreamFrameHolder.cpp
   src/openni2/OniSyncedStreamsFrameHolder.cpp
   src/openni2/OpenNI.cpp
+  
   src/point_cloud_proc/point_cloud_xyz.cpp
   src/point_cloud_proc/point_cloud_xyzrgb.cpp
   src/d2c_viewer.cpp
@@ -156,7 +157,6 @@ add_library(${PROJECT_NAME}
 )
 
 target_include_directories(${PROJECT_NAME} PUBLIC
-
   $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>

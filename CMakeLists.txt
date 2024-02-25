@@ -131,7 +131,7 @@ link_directories(
   ${catkin_LINK_DIRS}
   ${OpenCV_LIBS})
 
-file(GLOB_RECURSE XN_SRCS "src/xn/Linux/*.cpp;src/xn/*.cpp")
+file(GLOB_RECURSE XN_SRCS "src/xn/*.cpp")
 file(GLOB_RECURSE OPENNI_SRCS "src/openni2/*.cpp")
 file(GLOB_RECURSE FORMATS_SRCS "src/Drivers/OniFile/Formats/*.cpp")
 

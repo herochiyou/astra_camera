@@ -113,7 +113,8 @@ void OBCameraNodeFactory::startDevice(
     const std::shared_ptr<openni::Device> &device,
     const openni::DeviceInfo *device_info) {
   std::lock_guard<decltype(device_lock_)> lock(device_lock_);
-  ROS_INFO_STREAM("Start device " << serial_number_);
+  LOG(ERROR) << "Start device:(" << serial_number_ << ").";
+  // ROS_INFO_STREAM("Start device " << serial_number_);
   device_uri_ = device_info->getUri();
   device_ = device;
   if (ob_camera_node_) {
@@ -124,20 +125,24 @@ void OBCameraNodeFactory::startDevice(
     ob_camera_node_ = std::make_unique<OBCameraNode>(nh_, nh_private_, device_,
                                                      use_uvc_camera_);
   } catch (const std::exception &e) {
-    ROS_ERROR_STREAM("Start device " << serial_number_
-                                     << " failed: " << e.what());
+    LOG(ERROR) << "Start device:(" << serial_number_ << "),failed:(" << e.what()
+               << ").";
+    // ROS_ERROR_STREAM("Start device " << serial_number_
+    //                                  << " failed: " << e.what());
     ob_camera_node_.reset();
     has_exception_ = true;
     device_uri_ = "";
     device_connected_ = false;
     return;
   } catch (...) {
-    ROS_ERROR_STREAM("Start device " << serial_number_ << " failed");
+    LOG(ERROR) << "Start device(" << serial_number_ << "),failed";
+    // ROS_ERROR_STREAM("Start device " << serial_number_ << " failed");
     ob_camera_node_.reset();
     device_uri_ = "";
     device_connected_ = false;
     has_exception_ = true;
-    ROS_ERROR_STREAM("Device is Not Connected, return");
+    LOG(ERROR) << "Device is Not Connected, return";
+    // ROS_ERROR_STREAM("Device is Not Connected, return");
     return;
   }
   device_connected_ = true;

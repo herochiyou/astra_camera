@@ -1,6 +1,7 @@
 {
     "files.associations": {
         "*.bb": "makefile",
-        "ostream": "cpp"
+        "ostream": "cpp",
+        "dense": "cpp"
     }
 }

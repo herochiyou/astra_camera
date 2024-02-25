@@ -11,46 +11,47 @@
 /**************************************************************************/
 #pragma once
 
+#include <OpenNI.h>
+#include <eigen3/Eigen/Dense>
+#include <functional>
 #include <glog/logging.h>
-#include <openni2/OpenNI.h>
 #include <ros/ros.h>
 #include <sensor_msgs/CameraInfo.h>
 #include <sensor_msgs/Image.h>
-#include <tf2/LinearMath/Quaternion.h>
-#include <eigen3/Eigen/Dense>
-#include <functional>
-#include <sensor_msgs/distortion_models.h>
 #include <sensor_msgs/PointCloud2.h>
+#include <sensor_msgs/distortion_models.h>
+#include <tf2/LinearMath/Quaternion.h>
 
 #include "astra_camera/Extrinsics.h"
 #include "constants.h"
 #include "types.h"
 
 namespace astra_camera {
-bool operator==(const openni::VideoMode& lhs, const openni::VideoMode& rhs);
+bool operator==(const openni::VideoMode &lhs, const openni::VideoMode &rhs);
 
-bool operator!=(const openni::VideoMode& lhs, const openni::VideoMode& rhs);
+bool operator!=(const openni::VideoMode &lhs, const openni::VideoMode &rhs);
 
-std::ostream& operator<<(std::ostream& os, const openni::VideoMode& video_mode);
+std::ostream &operator<<(std::ostream &os, const openni::VideoMode &video_mode);
 
-tf2::Quaternion rotationMatrixToQuaternion(const std::vector<float>& rotation);
+tf2::Quaternion rotationMatrixToQuaternion(const std::vector<float> &rotation);
 
-Extrinsics obExtrinsicsToMsg(const std::vector<float>& rotation,const std::vector<float>& transition,
-                             const std::string& frame_id);
+Extrinsics obExtrinsicsToMsg(const std::vector<float> &rotation,
+                             const std::vector<float> &transition,
+                             const std::string &frame_id);
 
+bool isValidCameraParams(const OBCameraParams &params);
 
-bool isValidCameraParams(const OBCameraParams& params);
+void cameraParameterPrinter(const std::vector<float> &rotation,
+                            const std::vector<float> &transition);
 
-void cameraParameterPrinter(const std::vector<float>& rotation,
-                            const std::vector<float>& transition);
+std::string PixelFormatToString(const openni::PixelFormat &format);
 
-std::string PixelFormatToString(const openni::PixelFormat& format);
+void savePointToPly(sensor_msgs::PointCloud2::Ptr cloud,
+                    const std::string &filename);
 
-void savePointToPly(sensor_msgs::PointCloud2::Ptr cloud, const std::string& filename);
+void saveRGBPointToPly(sensor_msgs::PointCloud2::Ptr cloud,
+                       const std::string &filename);
 
-void saveRGBPointToPly(sensor_msgs::PointCloud2::Ptr cloud, const std::string& filename);
+MultiDeviceSyncMode getMultiDeviceSyncMode(const std::string &mode);
 
-MultiDeviceSyncMode getMultiDeviceSyncMode(const std::string& mode);
-
-
-}  // namespace astra_camera
+} // namespace astra_camera

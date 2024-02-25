@@ -123,10 +123,11 @@ add_definitions(-Dlibuvc_VERSION_MAJOR=${libuvc_VERSION_MAJOR})
 add_definitions(-Dlibuvc_VERSION_MINOR=${libuvc_VERSION_MINOR})
 add_definitions(-Dlibuvc_VERSION_PATCH=${libuvc_VERSION_PATCH})
 
-set(ORBBEC_OPENNI2_REDIST
-  "${CMAKE_CURRENT_SOURCE_DIR}/include/openni2_redist/${HOST_PLATFORM}")
+# set(ORBBEC_OPENNI2_REDIST
+#   "${CMAKE_CURRENT_SOURCE_DIR}/include/openni2_redist/${HOST_PLATFORM}")
 
-link_directories(${ORBBEC_OPENNI2_REDIST}
+link_directories(
+  # ${ORBBEC_OPENNI2_REDIST}
   ${catkin_LINK_DIRS}
   ${OpenCV_LIBS})
 
@@ -187,8 +188,8 @@ target_include_directories(${PROJECT_NAME}_node PUBLIC
 )
 
 target_link_libraries(${PROJECT_NAME}_node
-  -lOpenNI2
-  -L${ORBBEC_OPENNI2_REDIST}
+  # -lOpenNI2
+  # -L${ORBBEC_OPENNI2_REDIST}
   ${PROJECT_NAME}
   ${catkin_LIBRARIES}
   ${CMAKE_THREAD_LIBS_INIT}
@@ -211,8 +212,8 @@ target_include_directories(list_devices_node PUBLIC
 )
 
 target_link_libraries(list_devices_node
-  -lOpenNI2
-  -L${ORBBEC_OPENNI2_REDIST}
+  # -lOpenNI2
+  # -L${ORBBEC_OPENNI2_REDIST}
   ${PROJECT_NAME}
   ${catkin_LIBRARIES}
   ${CMAKE_THREAD_LIBS_INIT}
@@ -230,13 +231,13 @@ install(TARGETS ${PROJECT_NAME}
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
-install(FILES ${ORBBEC_OPENNI2_REDIST}/libOpenNI2.so
-  DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}/
-)
+# install(FILES ${ORBBEC_OPENNI2_REDIST}/libOpenNI2.so
+#   DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}/
+# )
 
-install(DIRECTORY ${ORBBEC_OPENNI2_REDIST}/OpenNI2
-  DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}/
-)
+# install(DIRECTORY ${ORBBEC_OPENNI2_REDIST}/OpenNI2
+#   DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}/
+# )
 
 install(DIRECTORY include
   DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}/

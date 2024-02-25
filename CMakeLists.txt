@@ -132,7 +132,7 @@ link_directories(
   ${OpenCV_LIBS})
 
 file(GLOB_RECURSE XN_SRCS "src/xn/Linux/*.cpp")
-message("XN_SRCS:${XN_SRCS}"  );
+message("XN_SRCS:${XN_SRCS}"  )
 
 add_library(${PROJECT_NAME}
   src/xn/Linux/XnLinuxSharedLibs.cpp

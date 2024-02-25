@@ -23,11 +23,11 @@
 //---------------------------------------------------------------------------
 #include <XnUSB.h>
 
-#if (XN_PLATFORM == XN_PLATFORM_ANDROID_ARM)
-#include <libusb.h>
-#else
+// #if (XN_PLATFORM == XN_PLATFORM_ANDROID_ARM)
+// #include <libusb.h>
+// #else
 #include <libusb-1.0/libusb.h>
-#endif
+// #endif
 
 #include "../XnUSBInternal.h"
 #include "XnLinuxUSB.h"

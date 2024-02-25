@@ -220,10 +220,8 @@ class Hash {
 
   XnStatus Set(const TKey &key, const TValue &value) {
     xnl::HashCode hash = KeyManager::Hash(key);
-
     if (m_apBins[hash] == NULL) {
       m_apBins[hash] = XN_NEW(TPairList);
-
       if (hash < m_minBin) {
         m_minBin = hash;
       }

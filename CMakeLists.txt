@@ -157,7 +157,6 @@ target_include_directories(${PROJECT_NAME} PUBLIC
   $<INSTALL_INTERFACE:include>
   ${CMAKE_CURRENT_SOURCE_DIR}/src/openni2/
   ${CMAKE_CURRENT_SOURCE_DIR}/src/xn/
-  # ${CMAKE_CURRENT_SOURCE_DIR}/src/Drivers/
   ${CMAKE_CURRENT_SOURCE_DIR}/src/Drivers/OniFile/Formats/
   ${catkin_INCLUDE_DIRS}
   ${Boost_INCLUDE_DIRS}

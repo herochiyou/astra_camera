@@ -69,6 +69,7 @@ void OBCameraNode::clean() {
 void OBCameraNode::init() {
   std::lock_guard<decltype(device_lock_)> lock(device_lock_);
   if (!device_->isValid()) {
+    LOG(ERROR) << "OBCameraNode::init device is not valid";
     ROS_ERROR_STREAM("OBCameraNode::init device is not valid");
     throw std::runtime_error("OBCameraNode::init device is not valid");
   }
@@ -76,6 +77,9 @@ void OBCameraNode::init() {
   device_info_ = device_->getDeviceInfo();
   setupConfig();
   setupTopics();
+
+  LOG(ERROR) << "enable_d2c_viewer_:(" << enable_d2c_viewer_ << ").";
+
   if (enable_d2c_viewer_) {
     d2c_filter_ = std::make_unique<D2CViewer>(nh_, nh_private_);
   }
@@ -337,11 +341,16 @@ void OBCameraNode::setupVideoMode() {
 }
 
 void OBCameraNode::setupD2CConfig() {
+  LOG(ERROR) << "depth_align_:(" << depth_align_ << ").";
+  LOG(ERROR) << "enable_pointcloud_xyzrgb_:(" << enable_pointcloud_xyzrgb_
+             << ").";
+
   if (!depth_align_ && !enable_pointcloud_xyzrgb_) {
     return;
   }
   auto color_width = width_[COLOR];
   auto color_height = height_[COLOR];
+
   setImageRegistrationMode(depth_align_);
   setDepthColorSync(color_depth_synchronization_);
   if (depth_align_ || enable_pointcloud_xyzrgb_) {

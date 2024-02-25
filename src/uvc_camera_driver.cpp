@@ -94,6 +94,7 @@ UVCCameraDriver::UVCCameraDriver(ros::NodeHandle &nh,
                                  const sensor_msgs::CameraInfo &camera_info,
                                  const std::string &serial_number)
     : nh_(nh), nh_private_(nh_private), camera_info_(camera_info) {
+  LOG(ERROR) << "UVCCameraDriver";
   auto err = uvc_init(&ctx_, nullptr);
   if (err != UVC_SUCCESS) {
     uvc_perror(err, "ERROR: uvc_init");

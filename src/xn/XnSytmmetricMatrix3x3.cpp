@@ -20,7 +20,7 @@
  *****************************************************************************/
 #include "XnMatrix3x3.h"
 #include "XnSymmetricMatrix3x3.h"
-
+#include <glog/logging.h>
 // #define USE_STABLE_EIGENVALUES
 // #define ALWAYS_USE_SCALING_FOR_EIGENVALUES
 
@@ -83,6 +83,7 @@ void SymmetricMatrix3x3::GetEigenVectors(const Vector3D &lambda,
   XnFloat tiny = tolerance * Math::MaxAbs(lambda.x, lambda.z);
   if (lambda.x - lambda.y <= tiny) {
     if (lambda.y - lambda.z <= tiny) {
+      LOG(ERROR) << "No function  Matrix3x3::Identity()";
       //   eigenvectors = Matrix3x3::Identity();
     } else {
       Vector3D v2;

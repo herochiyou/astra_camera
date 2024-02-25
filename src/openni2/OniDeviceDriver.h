@@ -72,14 +72,17 @@ class DeviceDriver {
   driver_DeviceDisconnected(const OniDeviceInfo *pInfo, void *pCookie);
   static void ONI_CALLBACK_TYPE driver_DeviceStateChanged(
       const OniDeviceInfo *pInfo, OniDeviceState deviceState, void *pCookie);
+
   DriverServices m_driverServices;
   OniDriverServices *m_pDriverServicesForDriver;
   xnl::ErrorLogger &m_errorLogger;
   DriverHandler m_driverHandler;
   FrameManager &m_frameManager;
+
   bool m_valid;
-  xnl::StringsHash<Device *> m_devices xnl::Event1Arg<Device *>
-      m_deviceConnectedEvent;
+  xnl::StringsHash<Device *> m_devices;
+
+  xnl::Event1Arg<Device *> m_deviceConnectedEvent;
   xnl::Event1Arg<Device *> m_deviceDisconnectedEvent;
   xnl::Event2Args<Device *, OniDeviceState> m_deviceStateChangedEvent;
 

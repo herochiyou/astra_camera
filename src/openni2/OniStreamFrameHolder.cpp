@@ -18,8 +18,8 @@
  *  limitations under the License.                                            *
  *                                                                            *
  *****************************************************************************/
-#include "openni2/OniStreamFrameHolder.h"
-#include "openni2/OniStream.h"
+#include "OniStreamFrameHolder.h"
+#include "OniStream.h"
 
 ONI_NAMESPACE_IMPLEMENTATION_BEGIN
 

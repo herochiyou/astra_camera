@@ -18,7 +18,7 @@
  *  limitations under the License.                                            *
  *                                                                            *
  *****************************************************************************/
-#include "openni2/OniDeviceDriver.h"
+#include "OniDeviceDriver.h"
 #include "Driver/OniDriverTypes.h"
 #include "OniStream.h"
 #include "XnArray.h"

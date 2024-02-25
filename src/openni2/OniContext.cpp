@@ -18,8 +18,8 @@
  *  limitations under the License.                                            *
  *                                                                            *
  *****************************************************************************/
-#include "openni2/OniContext.h"
-#include "openni2/OniStreamFrameHolder.h"
+#include "OniContext.h"
+#include "OniStreamFrameHolder.h"
 #include <XnLog.h>
 #include <XnOSCpp.h>
 

@@ -18,10 +18,10 @@
  *  limitations under the License.                                            *
  *                                                                            *
  *****************************************************************************/
-#include "openni2/OniContext.h"
-#include "openni2/OniInternal.h"
-#include "openni2/OniProperties.h"
-#include "openni2/OniVersion.h"
+#include "OniContext.h"
+#include "OniInternal.h"
+#include "OniProperties.h"
+#include "OniVersion.h"
 #include <XnLog.h>
 
 oni::implementation::Context g_Context;

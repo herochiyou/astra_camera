@@ -18,7 +18,7 @@
  *  limitations under the License.                                            *
  *                                                                            *
  *****************************************************************************/
-#include "openni2/OniSyncedStreamsFrameHolder.h"
+#include "OniSyncedStreamsFrameHolder.h"
 #include "Driver/OniDriverTypes.h"
 
 ONI_NAMESPACE_IMPLEMENTATION_BEGIN

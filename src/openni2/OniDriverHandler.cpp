@@ -18,7 +18,7 @@
  *  limitations under the License.                                            *
  *                                                                            *
  *****************************************************************************/
-#include "openni2/OniDriverHandler.h"
+#include "OniDriverHandler.h"
 #include "XnLib.h"
 #include <XnLog.h>
 

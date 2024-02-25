@@ -18,7 +18,7 @@
  *  limitations under the License.                                            *
  *                                                                            *
  *****************************************************************************/
-#include "openni2/OniRecorder.h"
+#include "OniRecorder.h"
 
 #include "XnLockGuard.h"
 

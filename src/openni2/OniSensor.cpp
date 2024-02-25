@@ -1,4 +1,4 @@
-#include "openni2/OniSensor.h"
+#include "OniSensor.h"
 #include <OniCAPI.h>
 
 ONI_NAMESPACE_IMPLEMENTATION_BEGIN

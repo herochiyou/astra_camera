@@ -18,12 +18,12 @@
  *  limitations under the License.                                            *
  *                                                                            *
  *****************************************************************************/
-#include "openni2/OniStream.h"
+#include "OniStream.h"
 #include "Driver/OniDriverTypes.h"
+#include "OniDevice.h"
+#include "OniProperties.h"
+#include "OniRecorder.h"
 #include "XnLockGuard.h"
-#include "openni2/OniDevice.h"
-#include "openni2/OniProperties.h"
-#include "openni2/OniRecorder.h"
 
 #include <math.h>
 

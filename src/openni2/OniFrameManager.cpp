@@ -1,4 +1,4 @@
-#include "openni2/OniFrameManager.h"
+#include "OniFrameManager.h"
 #include <XnOSCpp.h>
 
 ONI_NAMESPACE_IMPLEMENTATION_BEGIN

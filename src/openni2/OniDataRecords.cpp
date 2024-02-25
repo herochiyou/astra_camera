@@ -18,7 +18,7 @@
  *  limitations under the License.                                            *
  *                                                                            *
  *****************************************************************************/
-#include "openni2/OniDataRecords.h"
+#include "OniDataRecords.h"
 
 ONI_NAMESPACE_IMPLEMENTATION_BEGIN
 

@@ -18,10 +18,10 @@
  *  limitations under the License.                                            *
  *                                                                            *
  *****************************************************************************/
-#include "openni2/OniDevice.h"
-#include "openni2/OniContext.h"
-#include "openni2/OniSensor.h"
-#include "openni2/OniStream.h"
+#include "OniDevice.h"
+#include "OniContext.h"
+#include "OniSensor.h"
+#include "OniStream.h"
 #include <OniProperties.h>
 #include <XnLog.h>
 

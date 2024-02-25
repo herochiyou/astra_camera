@@ -45,13 +45,12 @@ OBCameraNodeFactory::OBCameraNodeFactory(ros::NodeHandle &nh,
 OBCameraNodeFactory::~OBCameraNodeFactory() {
   is_alive_ = false;
   device_connected_ = false;
-  ROS_INFO_STREAM(
-      "OBCameraNodeFactory::~OBCameraNodeFactory stop query device thread");
+  LOG(ERROR)
+      << "OBCameraNodeFactory::~OBCameraNodeFactory stop query device thread.";
   if (query_device_thread_ && query_device_thread_->joinable()) {
     query_device_thread_->join();
   }
-  ROS_INFO_STREAM("OBCameraNodeFactory::~OBCameraNodeFactory stop query device "
-                  "thread  done.");
+  LOG(ERROR) << "OBCameraNodeFactory::~OBCameraNodeFactory stop query device.";
   if (device_ && device_->isValid()) {
     device_->close();
   }

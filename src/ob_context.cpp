@@ -25,7 +25,6 @@ Context::Context(DeviceDisconnectedCb device_disconnected_cb)
 }
 
 std::vector<openni::DeviceInfo> Context::queryDeviceList() {
-  // get list of currently connected devices
   std::vector<openni::DeviceInfo> device_list;
   if (first_time_query_) {
     openni::Array<openni::DeviceInfo> device_info_list;

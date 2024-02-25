@@ -26,10 +26,8 @@ void DeviceConnectedCallback(const openni::DeviceInfo *device_info) {
   device->close();
 }
 
-int main() {
-  char **argv;
-  LOG(ERROR) << "-4";
-  google::InitGoogleLogging((const char *)argv[0]);
+int main(int argc, char **argv) {
+  google::InitGoogleLogging(argv[0]);
   LOG(ERROR) << "-3";
   google::SetStderrLogging(google::GLOG_INFO);
   LOG(ERROR) << "-2";
@@ -38,9 +36,9 @@ int main() {
   openni::OpenNI::initialize();
   LOG(ERROR) << "0";
   auto disconnected_cb = [](const openni::DeviceInfo *device_info) {
-    LOG(ERROR) << "Device:(" << device_info->getUri() << ").";
-    std::cout << "device " << device_info->getUri() << " disconnected"
-              << std::endl;
+    LOG(ERROR) << "Device:(" << device_info->getUri() << "),disconnected.";
+    // std::cout << "device " << device_info->getUri() << " disconnected"
+    //           << std::endl;
   };
   LOG(ERROR) << "1";
   auto context = std::make_unique<astra_camera::Context>(disconnected_cb);

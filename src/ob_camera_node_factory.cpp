@@ -38,7 +38,7 @@ namespace astra_camera {
 OBCameraNodeFactory::OBCameraNodeFactory(ros::NodeHandle &nh,
                                          ros::NodeHandle &nh_private)
     : nh_(nh), nh_private_(nh_private) {
-  LOG(ERROR) << "OBCameraNodeFactory::OBCameraNodeFactory";
+  LOG(ERROR) << "OBCameraNodeFactory start.";
   init();
 }
 
@@ -47,18 +47,16 @@ OBCameraNodeFactory::~OBCameraNodeFactory() {
   device_connected_ = false;
   LOG(ERROR)
       << "OBCameraNodeFactory::~OBCameraNodeFactory stop query device thread.";
-  if (query_device_thread_ && query_device_thread_->joinable()) {
+  if (query_device_thread_ && query_device_thread_->joinable())
     query_device_thread_->join();
-  }
   LOG(ERROR) << "OBCameraNodeFactory::~OBCameraNodeFactory stop query device.";
-  if (device_ && device_->isValid()) {
+  if (device_ && device_->isValid())
     device_->close();
-  }
   openni::OpenNI::shutdown();
 }
 
 void OBCameraNodeFactory::init() {
-  ROS_INFO_STREAM("Initializing OBCameraNodeFactory...");
+  LOG(ERROR) << "Initializing OBCameraNodeFactory...";
   astra_device_lock_shm_id_ =
       shm_open(DEFAULT_LOCK_FILE.c_str(), O_RDWR | O_CREAT, 0777);
   if (astra_device_lock_shm_id_ == -1) {

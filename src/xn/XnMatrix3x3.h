@@ -23,7 +23,6 @@
 
 #include "XnSymmetricMatrix3x3.h"
 #include "XnVector3D.h"
-#include <glog/logging.h>
 
 namespace xnl {
 

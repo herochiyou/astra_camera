@@ -231,6 +231,10 @@ void OBCameraNodeFactory::onDeviceConnected(
 
 void OBCameraNodeFactory::onDeviceDisconnected(
     const openni::DeviceInfo *device_info) {
+  LOG(ERROR) << "Device disconnected: name:(" << device_info->getName()
+             << "),uri:(" << device_info->getUri() << "),vendor:("
+             << device_info->getVendor() << ").";
+
   ROS_INFO_STREAM("Device disconnected: (name, "
                   << device_info->getName() << ") (uri, "
                   << device_info->getUri() << ") (vendor, "

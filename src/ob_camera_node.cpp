@@ -23,6 +23,7 @@ OBCameraNode::OBCameraNode(ros::NodeHandle &nh, ros::NodeHandle &nh_private,
                            bool use_uvc_camera)
     : nh_(nh), nh_private_(nh_private), device_(std::move(device)),
       use_uvc_camera_(use_uvc_camera) {
+  LOG(ERROR) << "Initial OBCameraNode";
   init();
 }
 
@@ -361,6 +362,7 @@ void OBCameraNode::setupD2CConfig() {
 void OBCameraNode::startStream(const stream_index_pair &stream_index) {
   std::lock_guard<decltype(device_lock_)> lock(device_lock_);
   if (!is_running_) {
+    LOG(ERROR) << "Device is not running.";
     ROS_ERROR_STREAM("Device is not running.");
     return;
   }

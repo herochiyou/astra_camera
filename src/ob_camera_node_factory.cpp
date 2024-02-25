@@ -284,7 +284,10 @@ OBCameraNodeFactory::getLogLevelFromString(const std::string &level) {
 
 void OBCameraNodeFactory::checkConnectionTimer() {
   if (!device_connected_) {
-    ROS_INFO_STREAM("wait for device " << serial_number_ << " to be connected");
+    LOG(ERROR) << "Wait for device sn:(" << serial_number_
+               << "),to be connected.";
+    // ROS_INFO_STREAM("wait for device " << serial_number_ << " to be
+    // connected");
   }
 }
 

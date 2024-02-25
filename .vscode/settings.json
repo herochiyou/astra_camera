@@ -3,6 +3,7 @@
         "*.bb": "makefile",
         "ostream": "cpp",
         "dense": "cpp",
-        "mutex": "cpp"
+        "mutex": "cpp",
+        "complex": "cpp"
     }
 }

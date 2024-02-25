@@ -143,7 +143,7 @@ add_library(${PROJECT_NAME}
   src/openni2/OniStreamFrameHolder.cpp
   src/openni2/OniSyncedStreamsFrameHolder.cpp
   src/openni2/OpenNI.cpp
-  
+
   src/point_cloud_proc/point_cloud_xyz.cpp
   src/point_cloud_proc/point_cloud_xyzrgb.cpp
   src/d2c_viewer.cpp
@@ -160,8 +160,10 @@ target_include_directories(${PROJECT_NAME} PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>
-  ${CMAKE_CURRENT_SOURCE_DIR}/include/openni2/
-  ${CMAKE_CURRENT_SOURCE_DIR}/include/xn/
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/openni2/
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/xn/
+  # ${CMAKE_CURRENT_SOURCE_DIR}/src/Drivers/
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/Drivers/PS1080/
   ${catkin_INCLUDE_DIRS}
   ${Boost_INCLUDE_DIRS}
   ${libuvc_INCLUDE_DIRS}

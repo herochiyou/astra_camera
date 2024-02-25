@@ -528,7 +528,7 @@ bool OBCameraNode::setAutoExposureCallback(
 bool OBCameraNode::setLaserEnableCallback(std_srvs::SetBoolRequest &request,
                                           std_srvs::SetBoolResponse &response) {
   std::lock_guard<decltype(device_lock_)> lock(device_lock_);
-  device_->setProperty(openni::OBEXTENSION_ID_LASER_EN, request.data);
+  device_->setProperty(OBEXTENSION_ID_LASER_EN, request.data);
   device_->setProperty(XN_MODULE_PROPERTY_EMITTER_STATE, request.data);
   response.success = true;
   return true;
@@ -622,8 +622,8 @@ bool OBCameraNode::getDeviceTypeCallback(GetStringRequest &request,
   char device_type_str[128] = {0};
   int data_size = sizeof(device_type_str);
   std::lock_guard<decltype(device_lock_)> lock(device_lock_);
-  device_->getProperty(openni::OBEXTENSION_ID_DEVICETYPE,
-                       (uint8_t *)&device_type_str, &data_size);
+  device_->getProperty(OBEXTENSION_ID_DEVICETYPE, (uint8_t *)&device_type_str,
+                       &data_size);
   response.data = device_type_str;
   return true;
 }

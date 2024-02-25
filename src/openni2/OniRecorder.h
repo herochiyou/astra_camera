@@ -27,9 +27,9 @@
 #include "XnString.h"
 
 // These come from OniFile/Formats
-#include "OniFile/Formats/Xn16zEmbTablesCodec.h"
-#include "OniFile/Formats/XnJpegCodec.h"
-#include "OniFile/Formats/XnUncompressedCodec.h"
+#include "Xn16zEmbTablesCodec.h"
+#include "XnJpegCodec.h"
+#include "XnUncompressedCodec.h"
 
 #include "OniCTypes.h"
 #include "OniCommon.h"

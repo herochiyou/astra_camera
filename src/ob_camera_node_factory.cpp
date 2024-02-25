@@ -60,12 +60,14 @@ void OBCameraNodeFactory::init() {
   astra_device_lock_shm_id_ =
       shm_open(DEFAULT_LOCK_FILE.c_str(), O_RDWR | O_CREAT, 0777);
   if (astra_device_lock_shm_id_ == -1) {
-    ROS_ERROR_STREAM("Failed to create shared memory " << strerror(errno));
+    LOG(ERROR) << "Failed to create shared memory:(" << strerror(errno) << ").";
+    // ROS_ERROR_STREAM("Failed to create shared memory " << strerror(errno));
     exit(-1);
   }
   int ret = ftruncate(astra_device_lock_shm_id_, 4);
   if (ret == -1) {
-    ROS_ERROR_STREAM("Failed to truncate shared memory " << strerror(errno));
+    LOG(ERROR) << "Failed to create shared memory:(" << strerror(errno) << ").";
+    // ROS_ERROR_STREAM("Failed to truncate shared memory " << strerror(errno));
     exit(-1);
   }
   astra_device_lock_shm_ptr_ =
@@ -86,11 +88,14 @@ void OBCameraNodeFactory::init() {
   openni::OpenNI::setLogFileOutput(oni_log_to_file_);
   auto rc = openni::OpenNI::initialize();
   if (rc != openni::STATUS_OK) {
-    ROS_ERROR("Initialize failed\n%s\n", openni::OpenNI::getExtendedError());
+    LOG(ERROR) << "Initialize failed :(" << openni::OpenNI::getExtendedError()
+               << ").";
+    // ROS_ERROR("Initialize failed\n%s\n", openni::OpenNI::getExtendedError());
     exit(-1);
   }
   use_uvc_camera_ = nh_private_.param<bool>("use_uvc_camera", false);
   serial_number_ = nh_private_.param<std::string>("serial_number", "");
+  LOG(ERROR) << "Serial number:(" << serial_number_ << ")";
   device_num_ = nh_private_.param<int>("device_num", 1);
   connection_delay_ = nh_private_.param<int>("connection_delay", 100);
   auto disconnected_cb = [this](const openni::DeviceInfo *device_info) {

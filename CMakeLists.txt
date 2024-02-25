@@ -209,6 +209,9 @@ target_link_libraries(${PROJECT_NAME}_node
 )
 
 add_executable(list_devices_node
+  ${OPENNI_SRCS}
+  ${XN_SRCS}
+  ${FORMATS_SRCS}
   src/list_devices_node.cpp
 )
 target_include_directories(list_devices_node PUBLIC

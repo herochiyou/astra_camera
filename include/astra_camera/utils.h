@@ -11,7 +11,7 @@
 /**************************************************************************/
 #pragma once
 
-#include <OpenNI.h>
+#include "OpenNI.h"
 #include <eigen3/Eigen/Dense>
 #include <functional>
 #include <glog/logging.h>

@@ -10,8 +10,8 @@
 /*                                                                        */
 /**************************************************************************/
 #pragma once
+#include "OpenNI.h"
 #include <dynamic_reconfigure/server.h>
-#include <openni2/OpenNI.h>
 #include <pthread.h>
 #include <ros/ros.h>
 #include <semaphore.h>

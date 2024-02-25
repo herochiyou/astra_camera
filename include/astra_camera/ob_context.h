@@ -11,8 +11,8 @@
 /**************************************************************************/
 #pragma once
 
+#include "OpenNI.h"
 #include <mutex>
-#include <openni2/OpenNI.h>
 #include <ros/ros.h>
 
 namespace astra_camera {

@@ -11,12 +11,12 @@
 /**************************************************************************/
 #pragma once
 
+#include "OpenNI.h"
 #include <astra_camera/AstraConfig.h>
 #include <camera_info_manager/camera_info_manager.h>
 #include <cv_bridge/cv_bridge.h>
 #include <dynamic_reconfigure/server.h>
 #include <image_transport/image_transport.h>
-#include <openni2/OpenNI.h>
 #include <openni2/PS1080.h>
 #include <ros/ros.h>
 #include <sensor_msgs/CameraInfo.h>

@@ -12,10 +12,10 @@
 
 #pragma once
 
+#include "OpenNI.h"
 #include <camera_info_manager/camera_info_manager.h>
 #include <image_transport/image_transport.h>
 #include <libuvc/libuvc.h>
-#include <openni2/OpenNI.h>
 #include <sensor_msgs/CameraInfo.h>
 
 #include <boost/optional.hpp>
@@ -50,23 +50,23 @@ struct UVCCameraConfig {
   std::string optical_frame_id;
   int retry_count = 0;
   UVCCameraConfig() = default;
-  UVCCameraConfig(const UVCCameraConfig&) = default;
-  UVCCameraConfig(UVCCameraConfig&&) = default;
-  UVCCameraConfig& operator=(const UVCCameraConfig&) = default;
-  UVCCameraConfig& operator=(UVCCameraConfig&&) = default;
+  UVCCameraConfig(const UVCCameraConfig &) = default;
+  UVCCameraConfig(UVCCameraConfig &&) = default;
+  UVCCameraConfig &operator=(const UVCCameraConfig &) = default;
+  UVCCameraConfig &operator=(UVCCameraConfig &&) = default;
 };
 
-std::ostream& operator<<(std::ostream& os, const UVCCameraConfig& config);
+std::ostream &operator<<(std::ostream &os, const UVCCameraConfig &config);
 
 class UVCCameraDriver {
- public:
-  explicit UVCCameraDriver(ros::NodeHandle& nh, ros::NodeHandle& nh_private,
-                           const sensor_msgs::CameraInfo& camera_info,
-                           const std::string& serial_number = "");
+  public:
+  explicit UVCCameraDriver(ros::NodeHandle &nh, ros::NodeHandle &nh_private,
+                           const sensor_msgs::CameraInfo &camera_info,
+                           const std::string &serial_number = "");
 
   ~UVCCameraDriver();
 
-  void updateConfig(const UVCCameraConfig& config);
+  void updateConfig(const UVCCameraConfig &config);
 
   void setVideoMode();
 
@@ -84,58 +84,67 @@ class UVCCameraDriver {
 #if defined(USE_RK_MPP)
   void mppInit();
   void mppDeInit();
-  void convertFrameToRGB(MppFrame frame, uint8_t* rgb_data);
-  bool MPPDecodeFrame(uvc_frame_t* frame, uint8_t* rgb_data);
+  void convertFrameToRGB(MppFrame frame, uint8_t *rgb_data);
+  bool MPPDecodeFrame(uvc_frame_t *frame, uint8_t *rgb_data);
 #endif
 
- private:
+  private:
   void setupCameraControlService();
 
   sensor_msgs::CameraInfo getCameraInfo();
 
-  static enum uvc_frame_format UVCFrameFormatString(const std::string& format);
+  static enum uvc_frame_format UVCFrameFormatString(const std::string &format);
 
-  static void frameCallbackWrapper(uvc_frame_t* frame, void* ptr);
+  static void frameCallbackWrapper(uvc_frame_t *frame, void *ptr);
 
-  void frameCallback(uvc_frame_t* frame);
+  void frameCallback(uvc_frame_t *frame);
 
-  void autoControlsCallback(enum uvc_status_class status_class, int event, int selector,
-                            enum uvc_status_attribute status_attribute, void* data,
-                            size_t data_len);
-  static void autoControlsCallbackWrapper(enum uvc_status_class status_class, int event,
-                                          int selector, enum uvc_status_attribute status_attribute,
-                                          void* data, size_t data_len, void* ptr);
+  void autoControlsCallback(enum uvc_status_class status_class, int event,
+                            int selector,
+                            enum uvc_status_attribute status_attribute,
+                            void *data, size_t data_len);
+  static void
+  autoControlsCallbackWrapper(enum uvc_status_class status_class, int event,
+                              int selector,
+                              enum uvc_status_attribute status_attribute,
+                              void *data, size_t data_len, void *ptr);
 
   void openCamera();
 
-  bool getUVCExposureCb(GetInt32Request& request, GetInt32Response& response);
+  bool getUVCExposureCb(GetInt32Request &request, GetInt32Response &response);
 
-  bool setUVCExposureCb(SetInt32Request& request, SetInt32Response& response);
+  bool setUVCExposureCb(SetInt32Request &request, SetInt32Response &response);
 
-  bool getUVCGainCb(GetInt32Request& request, GetInt32Response& response);
+  bool getUVCGainCb(GetInt32Request &request, GetInt32Response &response);
 
-  bool setUVCGainCb(SetInt32Request& request, SetInt32Response& response);
+  bool setUVCGainCb(SetInt32Request &request, SetInt32Response &response);
 
-  bool getUVCWhiteBalanceCb(GetInt32Request& request, GetInt32Response& response);
+  bool getUVCWhiteBalanceCb(GetInt32Request &request,
+                            GetInt32Response &response);
 
-  bool setUVCWhiteBalanceCb(SetInt32Request& request, SetInt32Response& response);
+  bool setUVCWhiteBalanceCb(SetInt32Request &request,
+                            SetInt32Response &response);
 
-  bool setUVCAutoExposureCb(std_srvs::SetBoolRequest& request, std_srvs::SetBoolResponse& response);
+  bool setUVCAutoExposureCb(std_srvs::SetBoolRequest &request,
+                            std_srvs::SetBoolResponse &response);
 
-  bool setUVCAutoWhiteBalanceCb(std_srvs::SetBoolRequest& request,
-                                std_srvs::SetBoolResponse& response);
+  bool setUVCAutoWhiteBalanceCb(std_srvs::SetBoolRequest &request,
+                                std_srvs::SetBoolResponse &response);
 
-  bool getUVCMirrorCb(GetInt32Request& request, GetInt32Response& response);
+  bool getUVCMirrorCb(GetInt32Request &request, GetInt32Response &response);
 
-  bool setUVCMirrorCb(std_srvs::SetBoolRequest& request, std_srvs::SetBoolResponse& response);
+  bool setUVCMirrorCb(std_srvs::SetBoolRequest &request,
+                      std_srvs::SetBoolResponse &response);
 
-  bool toggleUVCCamera(std_srvs::SetBoolRequest& request, std_srvs::SetBoolResponse& response);
+  bool toggleUVCCamera(std_srvs::SetBoolRequest &request,
+                       std_srvs::SetBoolResponse &response);
 
-  bool saveImageCallback(std_srvs::EmptyRequest& request, std_srvs::EmptyResponse& response);
+  bool saveImageCallback(std_srvs::EmptyRequest &request,
+                         std_srvs::EmptyResponse &response);
 
   int UVCGetControl(int control, int unit, int len, uvc_req_code req_code);
 
- private:
+  private:
   ros::NodeHandle nh_;
   ros::NodeHandle nh_private_;
   UVCCameraConfig config_;
@@ -143,10 +152,10 @@ class UVCCameraDriver {
   std::string frame_id_;
   std::string color_info_uri_;
   ImageROI roi_;
-  uvc_context_t* ctx_ = nullptr;
-  uvc_device_t* device_ = nullptr;
-  uvc_device_handle_t* device_handle_ = nullptr;
-  uvc_frame_t* frame_buffer_ = nullptr;
+  uvc_context_t *ctx_ = nullptr;
+  uvc_device_t *device_ = nullptr;
+  uvc_device_handle_t *device_handle_ = nullptr;
+  uvc_frame_t *frame_buffer_ = nullptr;
   uvc_stream_ctrl_t ctrl_{};
   std::atomic_bool uvc_flip_{false};
   std::atomic_bool is_streaming_started{false};
@@ -170,22 +179,23 @@ class UVCCameraDriver {
   ros::Publisher camera_info_publisher_;
   sensor_msgs::CameraInfo camera_info_;
   std::recursive_mutex device_lock_;
-  std::shared_ptr<camera_info_manager::CameraInfoManager> color_info_manager_ = nullptr;
+  std::shared_ptr<camera_info_manager::CameraInfoManager> color_info_manager_ =
+      nullptr;
   int device_num_ = 1;
 #if defined(USE_RK_MPP)
   MppCtx mpp_ctx_ = nullptr;
-  MppApi* mpp_api_ = nullptr;
+  MppApi *mpp_api_ = nullptr;
   MppPacket mpp_packet_ = nullptr;
   MppFrame mpp_frame_ = nullptr;
-  uint8_t* rgb_data_ = nullptr;
+  uint8_t *rgb_data_ = nullptr;
   MppDecCfg mpp_dec_cfg_ = nullptr;
   MppBuffer mpp_frame_buffer_ = nullptr;
   MppBuffer mpp_packet_buffer_ = nullptr;
-  uint8_t* data_buffer_ = nullptr;
+  uint8_t *data_buffer_ = nullptr;
   MppBufferGroup mpp_frame_group_ = nullptr;
   MppBufferGroup mpp_packet_group_ = nullptr;
   MppTask mpp_task_ = nullptr;
   uint32_t need_split_ = 0;
 #endif
 };
-}  // namespace astra_camera
+} // namespace astra_camera

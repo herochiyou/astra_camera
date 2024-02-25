@@ -139,6 +139,7 @@ file(GLOB_RECURSE FORMATS_SRCS "src/Drivers/OniFile/Formats/*.cpp")
 add_library(${PROJECT_NAME}
   ${OPENNI_SRCS}
   ${XN_SRCS}
+  ${FORMATS_SRCS}
   # src/xn/Linux/XnLinuxSharedLibs.cpp
   # src/xn/Linux/XnLinuxThreads.cpp
   # src/xn/Linux/XnLinuxFiles.cpp

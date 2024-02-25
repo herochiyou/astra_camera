@@ -133,6 +133,7 @@ link_directories(
 
 file(GLOB_RECURSE OPENNI_SRCS "src/xn/Linux/*.cpp")
 file(GLOB_RECURSE XN_SRCS "src/openni2/*.cpp")
+file(GLOB_RECURSE FORMATS_SRCS "src/Drivers/OniFile/Formats/*.cpp")
 # message("XN_SRCS:${XN_SRCS}"  )
 
 add_library(${PROJECT_NAME}

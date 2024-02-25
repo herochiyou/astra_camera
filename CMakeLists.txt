@@ -132,7 +132,17 @@ link_directories(
   ${OpenCV_LIBS})
 
 add_library(${PROJECT_NAME}
-  src/openni2/*.cpp
+  src/openni2/OniContext.cpp
+  src/openni2/OniDataRecords.cpp
+  src/openni2/OniDevice.cpp
+  src/openni2/OniDeviceDriver.cpp
+  src/openni2/OniFrameManager.cpp
+  src/openni2/OniRecorder.cpp
+  src/openni2/OniSensor.cpp
+  src/openni2/OniStream.cpp
+  src/openni2/OniStreamFrameHolder.cpp
+  src/openni2/OniSyncedStreamsFrameHolder.cpp
+  src/openni2/OpenNI.cpp
   src/point_cloud_proc/point_cloud_xyz.cpp
   src/point_cloud_proc/point_cloud_xyzrgb.cpp
   src/d2c_viewer.cpp
